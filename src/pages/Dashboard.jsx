@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import axiosInstance from '../api/axiosInstance';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -17,30 +17,18 @@ const Dashboard = () => {
   }, []);
 
   const fetchDashboardData = async () => {
-    try {
-      // Fetch recommended topics
-      const topicsResponse = await axiosInstance.get('/recommendations');
-      setRecommendedTopics(topicsResponse.data);
-
-      // Fetch user stats
-      const statsResponse = await axiosInstance.get(`/progress/${user?.id || 'me'}`);
-      setStats(statsResponse.data.stats);
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      // Set mock data for demo
-      setRecommendedTopics([
-        { id: 1, name: 'Advanced React Patterns', difficulty: 'Advanced', progress: 65 },
-        { id: 2, name: 'Node.js Microservices', difficulty: 'Intermediate', progress: 30 },
-        { id: 3, name: 'Python Data Science', difficulty: 'Beginner', progress: 80 },
-      ]);
-      setStats({
-        coursesCompleted: 12,
-        totalHours: 48,
-        accuracy: 87,
-      });
-    } finally {
-      setLoading(false);
-    }
+    // Using mock data for now - will be replaced with Spring Boot API later
+    setRecommendedTopics([
+      { id: 1, name: 'Advanced React Patterns', difficulty: 'Advanced', progress: 65 },
+      { id: 2, name: 'Node.js Microservices', difficulty: 'Intermediate', progress: 30 },
+      { id: 3, name: 'Python Data Science', difficulty: 'Beginner', progress: 80 },
+    ]);
+    setStats({
+      coursesCompleted: 12,
+      totalHours: 48,
+      accuracy: 87,
+    });
+    setLoading(false);
   };
 
   const getDifficultyColor = (difficulty) => {
@@ -140,9 +128,9 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              <button className="btn-primary w-full">
+              <Link to={`/course/${topic.id}`} className="btn-primary w-full block text-center">
                 Continue Learning →
-              </button>
+              </Link>
             </div>
           ))}
         </div>

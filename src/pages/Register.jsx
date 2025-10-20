@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -21,8 +22,13 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    if (!formData.name || !formData.email || !formData.password) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match!');
+      toast.error('Passwords do not match!');
       return;
     }
 
@@ -32,7 +38,7 @@ const Register = () => {
     const result = await register(userData);
     
     if (result.success) {
-      navigate('/dashboard');
+      navigate('/onboarding');
     }
     setLoading(false);
   };

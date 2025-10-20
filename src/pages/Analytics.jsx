@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import axiosInstance from '../api/axiosInstance';
 import { useAuth } from '../context/AuthContext';
 
 const Analytics = () => {
@@ -13,46 +12,39 @@ const Analytics = () => {
   }, []);
 
   const fetchAnalyticsData = async () => {
-    try {
-      const response = await axiosInstance.get(`/progress/${user?.id || 'me'}`);
-      setAnalyticsData(response.data);
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
-      // Mock data for demo
-      setAnalyticsData({
-        completionTrend: [
-          { month: 'Jan', completed: 2 },
-          { month: 'Feb', completed: 3 },
-          { month: 'Mar', completed: 5 },
-          { month: 'Apr', completed: 4 },
-          { month: 'May', completed: 7 },
-          { month: 'Jun', completed: 6 },
-        ],
-        performanceTrend: [
-          { week: 'Week 1', score: 75 },
-          { week: 'Week 2', score: 82 },
-          { week: 'Week 3', score: 78 },
-          { week: 'Week 4', score: 88 },
-          { week: 'Week 5', score: 85 },
-          { week: 'Week 6', score: 92 },
-        ],
-        categoryStrength: [
-          { name: 'Web Development', value: 85 },
-          { name: 'Data Science', value: 72 },
-          { name: 'Mobile Dev', value: 65 },
-          { name: 'DevOps', value: 78 },
-          { name: 'AI/ML', value: 68 },
-        ],
-        learningStats: {
-          totalCourses: 24,
-          inProgress: 5,
-          completed: 12,
-          notStarted: 7,
-        },
-      });
-    } finally {
-      setLoading(false);
-    }
+    // Using mock data for now - will be replaced with Spring Boot API later
+    setAnalyticsData({
+      completionTrend: [
+        { month: 'Jan', completed: 2 },
+        { month: 'Feb', completed: 3 },
+        { month: 'Mar', completed: 5 },
+        { month: 'Apr', completed: 4 },
+        { month: 'May', completed: 7 },
+        { month: 'Jun', completed: 6 },
+      ],
+      performanceTrend: [
+        { week: 'Week 1', score: 75 },
+        { week: 'Week 2', score: 82 },
+        { week: 'Week 3', score: 78 },
+        { week: 'Week 4', score: 88 },
+        { week: 'Week 5', score: 85 },
+        { week: 'Week 6', score: 92 },
+      ],
+      categoryStrength: [
+        { name: 'Web Development', value: 85 },
+        { name: 'Data Science', value: 72 },
+        { name: 'Mobile Dev', value: 65 },
+        { name: 'DevOps', value: 78 },
+        { name: 'AI/ML', value: 68 },
+      ],
+      learningStats: {
+        totalCourses: 24,
+        inProgress: 5,
+        completed: 12,
+        notStarted: 7,
+      },
+    });
+    setLoading(false);
   };
 
   const COLORS = ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];

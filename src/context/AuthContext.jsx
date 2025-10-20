@@ -1,63 +1,50 @@
-import { createContext, useState, useContext, useEffect } from 'react';
-import axiosInstance from '../api/axiosInstance';
+import { createContext, useState, useContext } from 'react';
 import { toast } from 'react-toastify';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Check if user is logged in on mount
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   const login = async (email, password) => {
-    try {
-      const response = await axiosInstance.post('/auth/login', { email, password });
-      const { token, user: userData } = response.data;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setUser(userData);
-      
-      toast.success('Login successful!');
-      return { success: true };
-    } catch (error) {
-      const message = error.response?.data?.message || 'Login failed. Please check your credentials.';
-      toast.error(message);
-      return { success: false, error: message };
-    }
+    // Simple login - just set user and navigate
+    const userData = {
+      email: email,
+      name: email.split('@')[0], // Use email prefix as name
+      id: Date.now(), // Simple ID generation
+    };
+    
+    setUser(userData);
+    toast.success('Login successful!');
+    return { success: true };
   };
 
   const register = async (userData) => {
-    try {
-      const response = await axiosInstance.post('/auth/register', userData);
-      const { token, user: newUser } = response.data;
-      
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(newUser));
-      setUser(newUser);
-      
-      toast.success('Registration successful!');
-      return { success: true };
-    } catch (error) {
-      const message = error.response?.data?.message || 'Registration failed. Please try again.';
-      toast.error(message);
-      return { success: false, error: message };
-    }
+    // Simple registration - just set user and navigate
+    const newUser = {
+      email: userData.email,
+      name: userData.name,
+      interests: userData.interests,
+      id: Date.now(),
+      needsOnboarding: true, // Flag to show onboarding page
+    };
+    
+    setUser(newUser);
+    toast.success('Registration successful!');
+    return { success: true };
+  };
+
+  const updateUserPreferences = (preferences) => {
+    // Update user with preferences from onboarding
+    setUser({
+      ...user,
+      preferences,
+      needsOnboarding: false,
+    });
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
     setUser(null);
     toast.info('Logged out successfully');
   };
@@ -67,6 +54,7 @@ export const AuthProvider = ({ children }) => {
     login,
     register,
     logout,
+    updateUserPreferences,
     isAuthenticated: !!user,
     loading,
   };
