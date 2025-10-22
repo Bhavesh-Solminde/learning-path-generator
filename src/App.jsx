@@ -1,20 +1,26 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Onboarding from './pages/Onboarding';
-import Dashboard from './pages/Dashboard';
-import Courses from './pages/Courses';
-import CourseLearning from './pages/CourseLearning';
-import Analytics from './pages/Analytics';
-import Profile from './pages/Profile';
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Onboarding from "./pages/Onboarding";
+import Dashboard from "./pages/Dashboard";
+import Courses from "./pages/Courses";
+import CourseLearning from "./pages/CourseLearning";
+import Analytics from "./pages/Analytics";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 
 // Components
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -25,7 +31,7 @@ function App() {
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
+
             {/* Onboarding Route - Semi-protected */}
             <Route
               path="/onboarding"
@@ -35,7 +41,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+
             {/* Protected Routes */}
             <Route
               path="/dashboard"
@@ -77,12 +83,20 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Default Route */}
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
-          
+
           {/* Toast Notifications */}
           <ToastContainer
             position="top-right"
@@ -103,4 +117,3 @@ function App() {
 }
 
 export default App;
-

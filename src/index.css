@@ -4,35 +4,102 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 antialiased;
+    @apply bg-background text-text-primary antialiased;
+  }
+
+  a {
+    @apply text-text-link hover:text-text-link-hover transition-colors duration-300;
   }
 }
 
 @layer components {
+  /* Cards with white background, blue border, soft shadow, rounded-xl */
   .card {
-    @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300;
+    @apply bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 ease-in-out border border-card-border/30 hover:border-card-border;
   }
-  
+
+  /* Primary CTA buttons: Electric Blue background, white text, subtle shadow, rounded-xl */
   .btn-primary {
-    @apply bg-primary hover:bg-primary-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
+    @apply bg-primary hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-xl transition-all duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
+    box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
   }
-  
+
+  .btn-primary:hover {
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
+  }
+
+  /* Secondary buttons: Soft Cyan border and text, transparent background, hover fill */
   .btn-secondary {
-    @apply bg-secondary hover:bg-secondary-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50;
+    @apply bg-transparent border-2 border-light-blue text-light-blue font-semibold py-2 px-4 rounded-xl transition-all duration-300 ease-in-out hover:bg-light-blue hover:text-white focus:outline-none focus:ring-2 focus:ring-light-blue focus:ring-opacity-50;
   }
-  
+
+  /* Form inputs: Soft Cyan border, Electric Blue focus ring, White background */
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-300;
+    @apply w-full px-4 py-2 border-2 border-light-blue bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300;
   }
-  
+
   .fade-in {
     animation: fadeIn 0.5s ease-in;
   }
-  
+
   .animate-fadeIn {
     animation: fadeIn 0.3s ease-in;
   }
-  
+
+  /* Progress bars with sky gradient and gold highlights */
+  .progress-bar {
+    @apply relative w-full bg-gray-200 rounded-full h-2 overflow-hidden;
+  }
+
+  .progress-bar-fill {
+    @apply h-full rounded-full transition-all duration-500 ease-out;
+    background: linear-gradient(
+      90deg,
+      rgb(90, 130, 255) 0%,
+      rgb(160, 90, 255) 100%
+    );
+    box-shadow: 0 0 10px rgba(255, 193, 37, 0.6);
+  }
+
+  /* Card hover glow effect with Accent Blue or Gold */
+  .card-hover-glow {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .card-hover-glow:hover {
+    box-shadow: 0 0 20px rgba(0, 153, 255, 0.4), 0 8px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .card-hover-gold:hover {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Navbar/Header styles with Deep Indigo */
+  .navbar {
+    @apply bg-navbar text-white shadow-lg;
+  }
+
+  /* Icon hover effects: Sky Blue default, Gold on hover */
+  .icon-hover {
+    @apply text-accent transition-all duration-300 ease-in-out hover:text-gold hover:scale-110;
+  }
+
+  /* Modal/Popup styles */
+  .modal {
+    @apply bg-white rounded-xl p-6;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Line clamp utility */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;
