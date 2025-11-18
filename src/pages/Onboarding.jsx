@@ -1,11 +1,34 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faLaptopCode,
+  faMobileAlt,
+  faChartLine,
+  faBrain,
+  faCogs,
+  faShieldAlt,
+  faCloud,
+  faLink,
+  faGraduationCap,
+  faArrowsAlt,
+  faBullseye,
+  faCertificate,
+  faUserGraduate,
+  faCode,
+  faUserTie,
+  faEye,
+  faCogs as faCogsAlt,
+  faBook,
+  faLayerGroup,
+  faClock,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Onboarding = () => {
   const navigate = useNavigate();
-  const { user, updateUserPreferences } = useAuth();
+  const { currentUser: user, updateUserPreferences } = useAuthContext();
   const [step, setStep] = useState(1);
   const [preferences, setPreferences] = useState({
     // Step 1: Learning Preferences
@@ -26,92 +49,118 @@ const Onboarding = () => {
   const learningGoals = [
     {
       id: "career-advancement",
-      label: " Career Advancement",
+      label: "Career Advancement",
       desc: "Grow within your current engineering field",
+      icon: faGraduationCap,
     },
     {
       id: "domain-shift",
-      label: " Domain Shift",
+      label: "Domain Shift",
       desc: "Transition to a new tech domain (e.g., AI, Cloud)",
+      icon: faArrowsAlt,
     },
     {
       id: "skill-specialization",
-      label: " Skill Specialization",
+      label: "Skill Specialization",
       desc: "Deepen expertise in a specific technology",
+      icon: faBullseye,
     },
     {
       id: "certification",
-      label: " Certification Prep",
+      label: "Certification Prep",
       desc: "Prepare for industry-recognized certifications",
+      icon: faCertificate,
     },
   ];
 
   const difficulties = [
     {
       id: "beginner",
-      label: " Beginner",
+      label: "Beginner",
       desc: "Little to no prior coding experience",
+      icon: faCode,
     },
     {
       id: "intermediate",
-      label: " Intermediate",
+      label: "Intermediate",
       desc: "Comfortable with core programming and projects",
+      icon: faUserGraduate,
     },
     {
       id: "advanced",
-      label: " Advanced",
+      label: "Advanced",
       desc: "Strong technical foundation with applied experience",
+      icon: faUserTie,
     },
   ];
 
   const learningStyles = [
     {
       id: "visual",
-      label: " Visual Learner",
+      label: "Visual Learner",
       desc: "Prefers videos, diagrams, and visualizations",
+      icon: faEye,
     },
     {
       id: "practical",
-      label: " Practical Learner",
+      label: "Practical Learner",
       desc: "Learns best through hands-on coding and projects",
+      icon: faCogsAlt,
     },
     {
       id: "theoretical",
-      label: " Theoretical Learner",
+      label: "Theoretical Learner",
       desc: "Focuses on reading documentation and research papers",
+      icon: faBook,
     },
     {
       id: "hybrid",
-      label: " Hybrid Learner",
+      label: "Hybrid Learner",
       desc: "Combines theory, visuals, and project-based learning",
+      icon: faLayerGroup,
     },
   ];
 
   const timeCommitments = [
-    { id: "30min", label: " 30 min/day", value: "30 minutes" },
-    { id: "1hour", label: " 1 hour/day", value: "1 hour" },
-    { id: "2hours", label: " 2 hours/day", value: "2 hours" },
-    { id: "3hours", label: " 3+ hours/day", value: "3+ hours" },
+    { id: "30min", label: "30 min/day", value: "30 minutes", icon: faClock },
+    { id: "1hour", label: "1 hour/day", value: "1 hour", icon: faClock },
+    { id: "2hours", label: "2 hours/day", value: "2 hours", icon: faClock },
+    { id: "3hours", label: "3+ hours/day", value: "3+ hours", icon: faClock },
   ];
 
   const categories = [
-    { id: "web-dev", label: " Web Development", icon: "💻" },
-    { id: "mobile-dev", label: " Mobile App Development", icon: "📱" },
-    { id: "data-science", label: " Data Science & Analytics", icon: "📈" },
+    { id: "web-dev", label: "Web Development", icon: "laptop-code" },
+    { id: "mobile-dev", label: "Mobile App Development", icon: "mobile-alt" },
+    {
+      id: "data-science",
+      label: "Data Science & Analytics",
+      icon: "chart-line",
+    },
     {
       id: "ai-ml",
-      label: " Artificial Intelligence & Machine Learning",
-      icon: "🧠",
+      label: "Artificial Intelligence & Machine Learning",
+      icon: "brain",
     },
-    { id: "devops", label: " DevOps & Automation", icon: "🔧" },
+    { id: "devops", label: "DevOps & Automation", icon: "cogs" },
     {
       id: "cybersecurity",
-      label: " Cybersecurity & Ethical Hacking",
-      icon: "🛡️",
+      label: "Cybersecurity & Ethical Hacking",
+      icon: "shield-alt",
     },
-    { id: "cloud", label: " Cloud Infrastructure & Deployment", icon: "☁️" },
-    { id: "blockchain", label: " Blockchain & Web3 Development", icon: "🔗" },
+    { id: "cloud", label: "Cloud Infrastructure & Deployment", icon: "cloud" },
+    { id: "blockchain", label: "Blockchain & Web3 Development", icon: "link" },
   ];
+
+  const categoryIconMap = {
+    "laptop-code": faLaptopCode,
+    "mobile-alt": faMobileAlt,
+    "chart-line": faChartLine,
+    brain: faBrain,
+    cogs: faCogs,
+    "shield-alt": faShieldAlt,
+    cloud: faCloud,
+    link: faLink,
+  };
 
   const currentlyLearningOptions = [
     "React",
@@ -261,8 +310,12 @@ const Onboarding = () => {
                         : "border-gray-200 hover:border-primary-300"
                     }`}
                   >
-                    <div className="text-lg font-semibold mb-1">
-                      {goal.label}
+                    <div className="flex items-center mb-2">
+                      <FontAwesomeIcon
+                        icon={goal.icon}
+                        className="text-2xl text-primary mr-3"
+                      />
+                      <div className="text-lg font-semibold">{goal.label}</div>
                     </div>
                     <div className="text-sm text-gray-600">{goal.desc}</div>
                   </button>
@@ -287,6 +340,10 @@ const Onboarding = () => {
                         : "border-gray-200 hover:border-primary-300"
                     }`}
                   >
+                    <FontAwesomeIcon
+                      icon={level.icon}
+                      className="text-3xl text-primary mb-2"
+                    />
                     <div className="text-lg font-semibold mb-1">
                       {level.label}
                     </div>
@@ -305,14 +362,23 @@ const Onboarding = () => {
                   <button
                     key={style.id}
                     onClick={() => handleSelection("learningStyle", style.id)}
-                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                    className={`p-4 rounded-lg border-2 text-left transition-all relative ${
                       preferences.learningStyle === style.id
                         ? "border-primary bg-primary-50"
                         : "border-gray-200 hover:border-primary-300"
                     }`}
                   >
-                    <div className="text-lg font-semibold mb-1">
-                      {style.label}
+                    {style.id === "hybrid" && (
+                      <span className="absolute -top-3 -right-4 bg-gold text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                        Best Choice
+                      </span>
+                    )}
+                    <div className="flex items-center mb-2">
+                      <FontAwesomeIcon
+                        icon={style.icon}
+                        className="text-2xl text-primary mr-3"
+                      />
+                      <div className="text-lg font-semibold">{style.label}</div>
                     </div>
                     <div className="text-sm text-gray-600">{style.desc}</div>
                   </button>
@@ -337,6 +403,10 @@ const Onboarding = () => {
                         : "border-gray-200 hover:border-primary-300"
                     }`}
                   >
+                    <FontAwesomeIcon
+                      icon={time.icon}
+                      className="text-2xl text-primary mb-2"
+                    />
                     <div className="font-semibold">{time.label}</div>
                   </button>
                 ))}
@@ -363,7 +433,10 @@ const Onboarding = () => {
                         : "border-gray-200 hover:border-primary-300"
                     }`}
                   >
-                    <div className="text-2xl mb-2">{category.icon}</div>
+                    <FontAwesomeIcon
+                      icon={categoryIconMap[category.icon]}
+                      className="text-3xl text-primary mb-2"
+                    />
                     <div className="font-semibold">{category.label}</div>
                   </button>
                 ))}
@@ -458,7 +531,7 @@ const Onboarding = () => {
                 ← Back
               </button>
             )}
-            {step < 4 ? (
+            {step < 3 ? (
               <button onClick={nextStep} className="btn-primary">
                 Continue →
               </button>

@@ -1,12 +1,22 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faClock,
+  faChartBar,
+  faPlay,
+  faFilePdf,
+  faCode,
+  faFileArchive,
+  faLink,
+} from "@fortawesome/free-solid-svg-icons";
 
 const CourseLearning = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthContext();
 
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -245,17 +255,19 @@ const CourseLearning = () => {
   const getResourceIcon = (type) => {
     switch (type) {
       case "pdf":
-        return "📄";
+        return <FontAwesomeIcon icon={faFilePdf} className="text-red-500" />;
       case "code":
-        return "💻";
+        return <FontAwesomeIcon icon={faCode} className="text-blue-500" />;
       case "presentation":
-        return "📊";
+        return <FontAwesomeIcon icon={faChartBar} className="text-green-500" />;
       case "zip":
-        return "📦";
+        return (
+          <FontAwesomeIcon icon={faFileArchive} className="text-yellow-600" />
+        );
       case "link":
-        return "🔗";
+        return <FontAwesomeIcon icon={faLink} className="text-primary" />;
       default:
-        return "📁";
+        return <FontAwesomeIcon icon={faFilePdf} className="text-gray-500" />;
     }
   };
 
@@ -538,7 +550,11 @@ const CourseLearning = () => {
                             </p>
                             <div className="flex items-center space-x-4 text-sm">
                               <span className="text-gray-600">
-                                ⏱️ {project.estimatedTime}
+                                <FontAwesomeIcon
+                                  icon={faClock}
+                                  className="mr-1"
+                                />{" "}
+                                {project.estimatedTime}
                               </span>
                               <span
                                 className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -620,7 +636,10 @@ const CourseLearning = () => {
                               </p>
                             </div>
                             {currentLesson?.id === lesson.id && (
-                              <span className="text-primary">▶</span>
+                              <FontAwesomeIcon
+                                icon={faPlay}
+                                className="text-primary"
+                              />
                             )}
                           </div>
                         </button>

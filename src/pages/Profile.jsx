@@ -1,10 +1,24 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import PageHeader from "../components/PageHeader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUser,
+  faRocket,
+  faCalendar,
+  faPuzzlePiece,
+  faHandshake,
+  faTrophy,
+  faChalkboardTeacher,
+  faLock,
+  faTrash,
+  faBell,
+  faGlobe,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthContext();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -15,12 +29,12 @@ const Profile = () => {
   });
 
   const badges = [
-    { id: 1, name: "Fast Learner", icon: "🚀", earned: true },
-    { id: 2, name: "Consistent", icon: "📅", earned: true },
-    { id: 3, name: "Problem Solver", icon: "🧩", earned: true },
-    { id: 4, name: "Team Player", icon: "🤝", earned: false },
-    { id: 5, name: "Expert", icon: "🏆", earned: false },
-    { id: 6, name: "Mentor", icon: "👨‍🏫", earned: false },
+    { id: 1, name: "Fast Learner", icon: faRocket, earned: true },
+    { id: 2, name: "Consistent", icon: faCalendar, earned: true },
+    { id: 3, name: "Problem Solver", icon: faPuzzlePiece, earned: true },
+    { id: 4, name: "Team Player", icon: faHandshake, earned: false },
+    { id: 5, name: "Expert", icon: faTrophy, earned: false },
+    { id: 6, name: "Mentor", icon: faChalkboardTeacher, earned: false },
   ];
 
   const learningPreferences = {
@@ -61,7 +75,14 @@ const Profile = () => {
 
   return (
     <div className="fade-in">
-      <PageHeader title="My Profile 👤" showProfileButton={false} />
+      <PageHeader
+        title={
+          <span>
+            My Profile <FontAwesomeIcon icon={faUser} />
+          </span>
+        }
+        showProfileButton={false}
+      />
 
       <div className="p-8">
         <div className="mb-8">
@@ -242,7 +263,8 @@ const Profile = () => {
             {/* Badges Card */}
             <div className="card p-6 card-hover-glow">
               <h2 className="text-xl font-bold text-text-primary mb-4">
-                Achievements 🏆
+                Achievements{" "}
+                <FontAwesomeIcon icon={faTrophy} className="text-gold" />
               </h2>
               <div className="grid grid-cols-3 gap-4">
                 {badges.map((badge) => (
@@ -254,7 +276,12 @@ const Profile = () => {
                         : "bg-muted/20 opacity-50"
                     }`}
                   >
-                    <span className="text-3xl mb-2">{badge.icon}</span>
+                    <FontAwesomeIcon
+                      icon={badge.icon}
+                      className={`text-3xl mb-2 ${
+                        badge.earned ? "text-primary" : "text-gray-400"
+                      }`}
+                    />
                     <p
                       className={`text-xs text-center font-medium ${
                         badge.earned ? "text-primary-700" : "text-muted"
@@ -273,17 +300,21 @@ const Profile = () => {
                 Account Settings
               </h2>
               <div className="space-y-3">
-                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-lg transition-all">
-                  🔔 Notification Settings
+                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-lg transition-all flex items-center">
+                  <FontAwesomeIcon icon={faBell} className="mr-2" />{" "}
+                  Notification Settings
                 </button>
-                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-lg transition-all">
-                  🔐 Change Password
+                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-lg transition-all flex items-center">
+                  <FontAwesomeIcon icon={faLock} className="mr-2" /> Change
+                  Password
                 </button>
-                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-lg transition-all">
-                  🌐 Language & Region
+                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-lg transition-all flex items-center">
+                  <FontAwesomeIcon icon={faGlobe} className="mr-2" /> Language &
+                  Region
                 </button>
-                <button className="w-full py-2 px-4 text-left text-error hover:bg-error/10 rounded-lg transition-all">
-                  🗑️ Delete Account
+                <button className="w-full py-2 px-4 text-left text-error hover:bg-error/10 rounded-lg transition-all flex items-center">
+                  <FontAwesomeIcon icon={faTrash} className="mr-2" /> Delete
+                  Account
                 </button>
               </div>
             </div>

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChartBar } from "@fortawesome/free-solid-svg-icons";
 import {
   LineChart,
   Line,
@@ -14,11 +16,11 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { useAuth } from "../context/AuthContext";
+import { useAuthContext } from "../context/AuthContext";
 import PageHeader from "../components/PageHeader";
 
 const Analytics = () => {
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthContext();
   const [analyticsData, setAnalyticsData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -91,7 +93,14 @@ const Analytics = () => {
 
   return (
     <div className="fade-in">
-      <PageHeader title="Progress Analytics 📊" showProfileButton={false} />
+      <PageHeader
+        title={
+          <span>
+            Progress Analytics <FontAwesomeIcon icon={faChartBar} />
+          </span>
+        }
+        showProfileButton={false}
+      />
 
       <div className="p-8">
         <div className="mb-8">

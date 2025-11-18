@@ -1,9 +1,11 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import Sidebar from './Sidebar';
+import { Navigate } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContext";
+import { useLayout } from "../context/LayoutContext";
+import Sidebar from "./Sidebar";
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuthContext();
+  const { isSidebarOpen, closeSidebar } = useLayout();
 
   if (loading) {
     return (
@@ -19,10 +21,8 @@ const ProtectedRoute = ({ children }) => {
 
   return (
     <div className="flex">
-      <Sidebar />
-      <div className="ml-64 flex-1 min-h-screen bg-gray-50">
-        {children}
-      </div>
+      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
+      <div className="lg:ml-64 flex-1 min-h-screen bg-gray-50">{children}</div>
     </div>
   );
 };

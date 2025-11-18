@@ -1,10 +1,19 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import PageHeader from "../components/PageHeader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUser,
+  faCog,
+  faLock,
+  faFileAlt,
+  faMobileAlt,
+  faBell,
+} from "@fortawesome/free-solid-svg-icons";
 
 const Settings = () => {
-  const { user, logout } = useAuth();
+  const { currentUser: user, logout } = useAuthContext();
   const [activeTab, setActiveTab] = useState("account");
 
   const [accountSettings, setAccountSettings] = useState({
@@ -88,10 +97,10 @@ const Settings = () => {
   };
 
   const tabs = [
-    { id: "account", label: "Account", icon: "👤" },
-    { id: "notifications", label: "Notifications", icon: "🔔" },
-    { id: "preferences", label: "Preferences", icon: "⚙️" },
-    { id: "security", label: "Security", icon: "🔐" },
+    { id: "account", label: "Account", icon: faUser },
+    { id: "notifications", label: "Notifications", icon: faBell },
+    { id: "preferences", label: "Preferences", icon: faCog },
+    { id: "security", label: "Security", icon: faLock },
   ];
 
   return (
@@ -118,7 +127,7 @@ const Settings = () => {
                   : "border-transparent text-text-secondary hover:text-text-primary"
               }`}
             >
-              <span className="mr-2">{tab.icon}</span>
+              <FontAwesomeIcon icon={tab.icon} className="mr-2" />
               {tab.label}
             </button>
           ))}
@@ -405,7 +414,10 @@ const Settings = () => {
                 <div className="space-y-4">
                   <div className="p-4 bg-accent/10 border border-accent/30 rounded-lg">
                     <div className="flex items-start">
-                      <span className="text-2xl mr-3">🔐</span>
+                      <FontAwesomeIcon
+                        icon={faLock}
+                        className="text-2xl mr-3 text-accent"
+                      />
                       <div>
                         <h3 className="font-semibold text-text-primary mb-1">
                           Two-Factor Authentication
@@ -422,7 +434,10 @@ const Settings = () => {
 
                   <div className="p-4 bg-muted/10 border border-card-border/20 rounded-lg">
                     <div className="flex items-start">
-                      <span className="text-2xl mr-3">📱</span>
+                      <FontAwesomeIcon
+                        icon={faMobileAlt}
+                        className="text-2xl mr-3 text-primary"
+                      />
                       <div>
                         <h3 className="font-semibold text-text-primary mb-1">
                           Active Sessions
@@ -439,7 +454,10 @@ const Settings = () => {
 
                   <div className="p-4 bg-muted/10 border border-card-border/20 rounded-lg">
                     <div className="flex items-start">
-                      <span className="text-2xl mr-3">📜</span>
+                      <FontAwesomeIcon
+                        icon={faFileAlt}
+                        className="text-2xl mr-3 text-primary"
+                      />
                       <div>
                         <h3 className="font-semibold text-text-primary mb-1">
                           Activity Log

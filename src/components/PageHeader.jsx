@@ -1,23 +1,35 @@
 import { useRef } from "react";
 import { Player } from "@lordicon/react";
+import { useLayout } from "../context/LayoutContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 import searchIcon from "./assets/Search.json";
 import messageIcon from "./assets/Message.json";
 import notificationIcon from "./assets/Notification.json";
 
 const PageHeader = ({ title, onProfileClick, showProfileButton = true }) => {
+  const { toggleSidebar } = useLayout();
   // Refs for animated icons
   const searchIconRef = useRef(null);
   const messageIconRef = useRef(null);
   const notificationIconRef = useRef(null);
 
   return (
-    <div className="bg-navbar border-b border-navbar-light px-8 py-4 flex items-center justify-between shadow-lg">
+    <div className="bg-navbar border-b border-navbar-light px-4 md:px-8 py-4 flex items-center justify-between shadow-lg">
       <div className="flex items-center space-x-4">
-        <h1 className="text-2xl font-bold text-white">{title}</h1>
+        {/* Hamburger Menu - Only visible on mobile/tablet */}
+        <button
+          className="lg:hidden p-2 hover:bg-navbar-light rounded-lg transition-all duration-300"
+          onClick={toggleSidebar}
+          aria-label="Open menu"
+        >
+          <FontAwesomeIcon icon={faBars} className="text-white text-xl" />
+        </button>
+        <h1 className="text-lg md:text-2xl font-bold text-white">{title}</h1>
       </div>
-      <div className="flex items-center space-x-4">
-        {/* Search Bar */}
-        <div className="relative flex items-center">
+      <div className="flex items-center space-x-2 md:space-x-4">
+        {/* Search Bar - Hidden on mobile */}
+        <div className="relative hidden md:flex items-center">
           <div className="absolute left-3 pointer-events-none">
             <Player
               ref={searchIconRef}

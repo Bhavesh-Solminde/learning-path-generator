@@ -1,12 +1,33 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useState, useEffect, useRef } from "react";
+import { useAuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenNib, faCode, faBook } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPlay,
+  faPenNib,
+  faCode,
+  faBook,
+  faClock,
+  faStar,
+  faTrophy,
+  faFire,
+  faBullseye,
+  faMedal,
+  faBookOpen,
+  faCheckCircle,
+  faXmark,
+  faInfoCircle,
+} from "@fortawesome/free-solid-svg-icons";
+import { Player } from "@lordicon/react";
+import fireIcon from "../components/assets/Fire.json";
+import targetIcon from "../components/assets/Target.json";
+import medalIcon from "../components/assets/Medal.json";
+import booksIcon from "../components/assets/Books.json";
+import checkIcon from "../components/assets/Check.json";
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthContext();
   const [continueLearning, setContinueLearning] = useState([]);
   const [recommendedCourses, setRecommendedCourses] = useState([]);
   const [userStats, setUserStats] = useState({
@@ -20,6 +41,13 @@ const Dashboard = () => {
   const [weeklyWatchTime, setWeeklyWatchTime] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
+
+  // Refs for animated icons
+  const fireRef = useRef(null);
+  const targetRef = useRef(null);
+  const medalRef = useRef(null);
+  const booksRef = useRef(null);
+  const checkRef = useRef(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -153,35 +181,49 @@ const Dashboard = () => {
         showProfileButton={true}
       />
 
-      <div className="flex">
-        {/* Main Content */}
-        <div className="flex-1 p-8">
+      <div className="flex flex-col lg:flex-row">
+        {/* Overlay when right sidebar is open on mobile/tablet */}
+        {isRightSidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+            onClick={() => setIsRightSidebarOpen(false)}
+          ></div>
+        )}
+        {/* Main Content - Hidden when right sidebar is open on mobile/tablet */}
+        <div
+          className={`flex-1 p-4 md:p-6 lg:p-8 xl:p-8 2xl:p-10 max-w-[1500px] 2xl:max-w-[1650px] mx-auto w-full transition-opacity duration-300 ${
+            isRightSidebarOpen ? "hidden lg:block" : "block"
+          }`}
+        >
           {/* Continue Learning Section */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-text-primary mb-6">
+          <div className="mb-6 lg:mb-8 xl:mb-8">
+            <h2 className="text-xl md:text-2xl lg:text-3xl xl:text-3xl font-bold text-text-primary mb-4 lg:mb-6 xl:mb-6">
               Continue Learning
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 xl:gap-6">
               {continueLearning.map((course) => (
-                <div key={course.id} className="card p-6 card-hover-glow">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-2xl shadow-sm">
+                <div
+                  key={course.id}
+                  className="card p-4 lg:p-6 xl:p-7 card-hover-glow"
+                >
+                  <div className="flex items-start space-x-3 lg:space-x-4 xl:space-x-5">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 2xl:w-16 2xl:h-16 bg-primary/10 rounded-xl flex items-center justify-center text-xl lg:text-2xl xl:text-3xl shadow-sm flex-shrink-0">
                       {course.icon}
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-semibold text-text-primary mb-1">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm lg:text-base xl:text-lg 2xl:text-xl text-text-primary mb-1 truncate">
                             {course.title}
                           </h3>
-                          <p className="text-xs text-text-secondary uppercase tracking-wide">
+                          <p className="text-xs lg:text-sm xl:text-sm text-text-secondary uppercase tracking-wide">
                             {course.category}
                           </p>
                         </div>
                       </div>
 
                       {/* Progress Bar */}
-                      <div className="mb-3 bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                      <div className="mb-3 bg-gray-200 rounded-full h-2.5 xl:h-3 overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all duration-500 ease-in-out"
                           style={{
@@ -193,16 +235,18 @@ const Dashboard = () => {
                         ></div>
                       </div>
 
-                      <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center justify-between text-xs lg:text-sm xl:text-sm">
                         <span className="text-text-secondary">
-                          <FontAwesomeIcon icon={faBook} />
+                          <FontAwesomeIcon icon={faBook} />{" "}
+                          {course.lessonsCompleted} / {course.lessonsTotal}{" "}
+                          Lessons
                         </span>
                         <span className="text-text-secondary">
-                          ⏱️ {course.timeLeft}
+                          <FontAwesomeIcon icon={faClock} /> {course.timeLeft}
                         </span>
                       </div>
 
-                      <button className="mt-4 btn-primary text-sm flex items-center gap-2">
+                      <button className="mt-3 lg:mt-4 btn-primary text-xs lg:text-sm xl:text-sm flex items-center gap-2 w-full lg:w-auto xl:px-5 xl:py-2.5">
                         Resume Course
                         <span className="ml-1">↻</span>
                       </button>
@@ -215,51 +259,57 @@ const Dashboard = () => {
 
           {/* Recommended Courses Section */}
           <div>
-            <h2 className="text-2xl font-bold text-text-primary mb-6">
+            <h2 className="text-xl md:text-2xl lg:text-3xl xl:text-3xl font-bold text-text-primary mb-4 lg:mb-6 xl:mb-6">
               Recommended Courses For You
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6 xl:gap-6">
               {recommendedCourses.map((course) => (
                 <div
                   key={course.id}
-                  className="card overflow-hidden card-hover-glow"
+                  className="card overflow-hidden card-hover-glow hover:scale-105 transition-transform duration-300"
                 >
                   <div className="relative">
                     <img
                       src={course.thumbnail}
                       alt={course.title}
-                      className="w-full h-48 object-cover"
+                      className="w-full h-40 lg:h-48 xl:h-52 2xl:h-56 object-cover"
                     />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                      <button className="w-12 h-12 bg-primary rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
-                        <span className="text-2xl text-white">▶</span>
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                      <button className="w-10 h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 bg-primary rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg">
+                        <FontAwesomeIcon
+                          icon={faPlay}
+                          className="text-white text-base lg:text-xl xl:text-xl ml-1"
+                        />
                       </button>
                     </div>
-                    <span className="absolute top-3 left-3 bg-gold text-navbar text-xs px-3 py-1 rounded font-semibold shadow-md">
+                    <span className="absolute top-3 left-3 bg-gold text-navbar text-xs lg:text-sm px-3 py-1 rounded font-semibold shadow-md">
                       {course.isBestseller ? "Best Seller" : "New"}
                     </span>
                     <span className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded">
                       {course.duration}
                     </span>
                   </div>
-                  <div className="p-5">
-                    <h3 className="font-semibold text-text-primary mb-2 line-clamp-2">
+                  <div className="p-4 lg:p-5 xl:p-5">
+                    <h3 className="font-semibold text-sm lg:text-base xl:text-base 2xl:text-lg text-text-primary mb-2 line-clamp-2">
                       {course.title}
                     </h3>
-                    <p className="text-sm text-text-secondary mb-3">
+                    <p className="text-xs lg:text-sm xl:text-sm text-text-secondary mb-3">
                       {course.instructor}
                     </p>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between text-xs lg:text-sm">
                       <div className="flex items-center space-x-2">
-                        <span className="text-yellow-500">⭐</span>
+                        <FontAwesomeIcon
+                          icon={faStar}
+                          className="text-yellow-500 text-xs lg:text-sm"
+                        />
                         <span className="font-semibold text-text-primary">
                           {course.rating}
                         </span>
-                        <span className="text-text-secondary text-sm">
+                        <span className="text-text-secondary text-xs lg:text-sm">
                           ({course.reviews})
                         </span>
                       </div>
-                      <span className="font-bold text-text-primary">
+                      <span className="font-bold text-base lg:text-lg text-text-primary">
                         ${course.price}
                       </span>
                     </div>
@@ -270,165 +320,217 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Right Sidebar */}
-        {isRightSidebarOpen && (
-          <div className="w-80 bg-white border-l border-card-border/40 p-6 space-y-6 shadow-lg">
-            {/* Close Details Button */}
-            <button
-              className="text-primary text-sm font-semibold flex items-center mb-4 hover:text-primary-600 transition-colors"
-              onClick={() => setIsRightSidebarOpen(false)}
-            >
-              <span className="mr-2">⊗</span> Close Details
-            </button>
+        {/* Right Sidebar - Full screen overlay on mobile/tablet, sticky on desktop */}
+        <div
+          className={`fixed lg:sticky top-0 right-0 h-screen w-full lg:w-80 2xl:w-96 bg-white border-l border-card-border/40 p-4 lg:p-6 space-y-4 lg:space-y-6 shadow-lg lg:overflow-y-auto z-40 transform transition-transform duration-300 ${
+            isRightSidebarOpen
+              ? "translate-x-0"
+              : "translate-x-full lg:translate-x-0 lg:hidden"
+          }`}
+        >
+          {/* Close Details Button - Visible on mobile/tablet */}
+          <button
+            className="text-primary text-xs lg:text-sm font-semibold flex items-center mb-4 hover:text-primary-600 transition-colors lg:hidden"
+            onClick={() => setIsRightSidebarOpen(false)}
+          >
+            <FontAwesomeIcon icon={faXmark} className="mr-2" /> Close Details
+          </button>
 
-            {/* User Profile Card */}
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-primary to-navbar rounded-full mx-auto mb-3 flex items-center justify-center ring-4 ring-gold shadow-lg">
-                <img
-                  src="https://ui-avatars.com/api/?name=Brooklyn+Simmons&background=FF6600&color=fff&size=80"
-                  alt="User"
-                  className="w-20 h-20 rounded-full"
-                />
-              </div>
-              <h3 className="font-bold text-profile-name">Brooklyn Simmons</h3>
-              <p className="text-sm text-profile-subtitle">
-                UI/UX Designer & Developer
-              </p>
-              <div className="flex items-center justify-center space-x-1 mt-2">
-                <span className="text-2xl">🏆</span>
-                <span className="text-sm font-semibold text-gold">
-                  876 Points
-                </span>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-4 mt-6">
-                <div className="text-center">
-                  <div className="flex items-center justify-center space-x-1 mb-1">
-                    <span className="text-xl">🔥</span>
-                    <span className="text-2xl font-bold text-text-primary">
-                      {userStats.daysStreak}
-                    </span>
-                  </div>
-                  <p className="text-xs text-text-secondary">Days Streak</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center space-x-1 mb-1">
-                    <span className="text-xl">🎯</span>
-                    <span className="text-2xl font-bold text-text-primary">
-                      {userStats.goalsInMonth}
-                    </span>
-                  </div>
-                  <p className="text-xs text-text-secondary">Goals in Month</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center space-x-1 mb-1">
-                    <span className="text-xl">🏅</span>
-                    <span className="text-2xl font-bold text-text-primary">
-                      {userStats.position}
-                    </span>
-                  </div>
-                  <p className="text-xs text-text-secondary">2nd Place</p>
-                </div>
-              </div>
+          {/* User Profile Card */}
+          <div className="text-center">
+            <div className="w-16 h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-primary to-navbar rounded-full mx-auto mb-3 flex items-center justify-center ring-4 ring-gold shadow-lg">
+              <img
+                src="https://ui-avatars.com/api/?name=Brooklyn+Simmons&background=FF6600&color=fff&size=80"
+                alt="User"
+                className="w-16 h-16 lg:w-20 lg:h-20 rounded-full"
+              />
+            </div>
+            <h3 className="font-bold text-base lg:text-lg text-profile-name">
+              Brooklyn Simmons
+            </h3>
+            <p className="text-xs lg:text-sm text-profile-subtitle">
+              UI/UX Designer & Developer
+            </p>
+            <div className="flex items-center justify-center space-x-2 mt-2">
+              <FontAwesomeIcon
+                icon={faTrophy}
+                className="text-xl lg:text-2xl text-gold animate-pulse"
+              />
+              <span className="text-xs lg:text-sm font-semibold text-gold">
+                876 Points
+              </span>
             </div>
 
-            {/* Weekly Streak */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-text-primary flex items-center">
-                  Weekly Streak <span className="ml-2 text-gray-400">ℹ️</span>
-                </h3>
-                <select className="text-sm text-text-secondary border-none focus:outline-none">
-                  <option>May 2024</option>
-                </select>
-              </div>
-              <p className="text-sm text-text-secondary mb-4">4/4 Weeks</p>
-
-              {/* Calendar */}
-              <div className="grid grid-cols-7 gap-2 mb-4">
-                {weeklyStreak.map((day, index) => (
-                  <div key={index} className="text-center">
-                    <p className="text-xs text-gray-500 mb-1">{day.day}</p>
-                    <div
-                      className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-medium transition-all ${
-                        day.isToday
-                          ? "bg-gold text-navbar shadow-md ring-2 ring-gold/50"
-                          : day.hasActivity
-                          ? "bg-accent text-white"
-                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                      }`}
-                    >
-                      {day.date}
-                    </div>
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-2 lg:gap-4 mt-4 lg:mt-6">
+              <div className="text-center">
+                <div className="flex items-center justify-center space-x-1 mb-1">
+                  <div
+                    className="w-5 h-5 lg:w-6 lg:h-6 cursor-pointer"
+                    onMouseEnter={() => fireRef.current?.playFromBeginning()}
+                  >
+                    <Player ref={fireRef} icon={fireIcon} size={24} />
                   </div>
-                ))}
-              </div>
-
-              {/* Progress Summary */}
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div className="bg-primary/10 border border-primary/30 p-3 rounded-lg text-center hover:shadow-md transition-shadow">
-                  <span className="text-2xl mb-1 block">📚</span>
-                  <p className="text-2xl font-bold text-text-primary">
-                    {userStats.coursesInProgress}
-                  </p>
-                  <p className="text-xs text-text-secondary">
-                    Courses In Progress
-                  </p>
+                  <span className="text-xl lg:text-2xl font-bold text-text-primary">
+                    {userStats.daysStreak}
+                  </span>
                 </div>
-                <div className="bg-gold/20 border border-gold/40 p-3 rounded-lg text-center hover:shadow-md transition-shadow">
-                  <span className="text-2xl mb-1 block">✅</span>
-                  <p className="text-2xl font-bold text-text-primary">
-                    {userStats.coursesCompleted}
-                  </p>
-                  <p className="text-xs text-text-secondary">Completed</p>
-                </div>
+                <p className="text-xs text-text-secondary">Days Streak</p>
               </div>
-            </div>
-
-            {/* Weekly Watch Time */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-text-primary flex items-center">
-                  Weekly Watch Time{" "}
-                  <span className="ml-2 text-gray-400">ℹ️</span>
-                </h3>
-                <select className="text-sm text-text-secondary border-none focus:outline-none">
-                  <option>May 2024</option>
-                </select>
-              </div>
-              <p className="text-sm text-text-secondary mb-4">4/4 Weeks</p>
-
-              {/* Bar Chart */}
-              <div className="space-y-2">
-                {weeklyWatchTime.map((item, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <span className="text-xs text-text-secondary w-8">
-                      {item.label}
-                    </span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-8 relative overflow-hidden">
-                      <div
-                        className="h-full rounded-full relative transition-all duration-500"
-                        style={{
-                          width: `${(item.hours / 8) * 100}%`,
-                          background:
-                            "linear-gradient(90deg, rgb(0, 102, 204) 0%, rgb(0, 153, 255) 100%)",
-                          boxShadow: "0 0 8px rgba(255, 215, 0, 0.5)",
-                        }}
-                      >
-                        {index === 2 && (
-                          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-white font-semibold">
-                            4:22m
-                          </span>
-                        )}
-                      </div>
-                    </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center space-x-1 mb-1">
+                  <div
+                    className="w-5 h-5 lg:w-6 lg:h-6 cursor-pointer"
+                    onMouseEnter={() => targetRef.current?.playFromBeginning()}
+                  >
+                    <Player ref={targetRef} icon={targetIcon} size={24} />
                   </div>
-                ))}
+                  <span className="text-xl lg:text-2xl font-bold text-text-primary">
+                    {userStats.goalsInMonth}
+                  </span>
+                </div>
+                <p className="text-xs text-text-secondary">Goals in Month</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center space-x-1 mb-1">
+                  <div
+                    className="w-5 h-5 lg:w-6 lg:h-6 cursor-pointer"
+                    onMouseEnter={() => medalRef.current?.playFromBeginning()}
+                  >
+                    <Player ref={medalRef} icon={medalIcon} size={24} />
+                  </div>
+                  <span className="text-xl lg:text-2xl font-bold text-text-primary">
+                    {userStats.position}
+                  </span>
+                </div>
+                <p className="text-xs text-text-secondary">2nd Place</p>
               </div>
             </div>
           </div>
-        )}
+
+          {/* Weekly Streak */}
+          <div>
+            <div className="flex items-center justify-between mb-3 lg:mb-4">
+              <h3 className="font-semibold text-sm lg:text-base text-text-primary flex items-center">
+                Weekly Streak{" "}
+                <FontAwesomeIcon
+                  icon={faInfoCircle}
+                  className="ml-2 text-gray-400 text-xs lg:text-sm"
+                />
+              </h3>
+              <select className="text-xs lg:text-sm text-text-secondary border-none focus:outline-none">
+                <option>May 2024</option>
+              </select>
+            </div>
+            <p className="text-xs lg:text-sm text-text-secondary mb-3 lg:mb-4">
+              4/4 Weeks
+            </p>
+
+            {/* Calendar */}
+            <div className="grid grid-cols-7 gap-1 lg:gap-2 mb-3 lg:mb-4">
+              {weeklyStreak.map((day, index) => (
+                <div key={index} className="text-center">
+                  <p className="text-[10px] lg:text-xs text-gray-500 mb-1">
+                    {day.day}
+                  </p>
+                  <div
+                    className={`w-8 h-8 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center text-xs lg:text-sm font-medium transition-all ${
+                      day.isToday
+                        ? "bg-gold text-navbar shadow-md ring-2 ring-gold/50"
+                        : day.hasActivity
+                        ? "bg-accent text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {day.date}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Progress Summary */}
+            <div className="grid grid-cols-2 gap-2 lg:gap-4 mt-3 lg:mt-4">
+              <div className="bg-primary/10 border border-primary/30 p-2 lg:p-3 rounded-lg text-center hover:shadow-md transition-shadow">
+                <div
+                  className="w-6 h-6 lg:w-8 lg:h-8 mx-auto mb-1 cursor-pointer"
+                  onMouseEnter={() => booksRef.current?.playFromBeginning()}
+                >
+                  <Player ref={booksRef} icon={booksIcon} size={32} />
+                </div>
+                <p className="text-xl lg:text-2xl font-bold text-text-primary">
+                  {userStats.coursesInProgress}
+                </p>
+                <p className="text-[10px] lg:text-xs text-text-secondary">
+                  Courses In Progress
+                </p>
+              </div>
+              <div className="bg-gold/20 border border-gold/40 p-2 lg:p-3 rounded-lg text-center hover:shadow-md transition-shadow">
+                <div
+                  className="w-6 h-6 lg:w-8 lg:h-8 mx-auto mb-1 cursor-pointer"
+                  onMouseEnter={() => checkRef.current?.playFromBeginning()}
+                >
+                  <Player ref={checkRef} icon={checkIcon} size={32} />
+                </div>
+                <p className="text-xl lg:text-2xl font-bold text-text-primary">
+                  {userStats.coursesCompleted}
+                </p>
+                <p className="text-[10px] lg:text-xs text-text-secondary">
+                  Completed
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Weekly Watch Time */}
+          <div>
+            <div className="flex items-center justify-between mb-3 lg:mb-4">
+              <h3 className="font-semibold text-sm lg:text-base text-text-primary flex items-center">
+                Weekly Watch Time{" "}
+                <FontAwesomeIcon
+                  icon={faInfoCircle}
+                  className="ml-2 text-gray-400 text-xs lg:text-sm"
+                />
+              </h3>
+              <select className="text-xs lg:text-sm text-text-secondary border-none focus:outline-none">
+                <option>May 2024</option>
+              </select>
+            </div>
+            <p className="text-xs lg:text-sm text-text-secondary mb-3 lg:mb-4">
+              4/4 Weeks
+            </p>
+
+            {/* Bar Chart */}
+            <div className="space-y-2">
+              {weeklyWatchTime.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center space-x-2 lg:space-x-3"
+                >
+                  <span className="text-[10px] lg:text-xs text-text-secondary w-6 lg:w-8">
+                    {item.label}
+                  </span>
+                  <div className="flex-1 bg-gray-200 rounded-full h-6 lg:h-8 relative overflow-hidden">
+                    <div
+                      className="h-full rounded-full relative transition-all duration-500"
+                      style={{
+                        width: `${(item.hours / 8) * 100}%`,
+                        background:
+                          "linear-gradient(90deg, rgb(0, 102, 204) 0%, rgb(0, 153, 255) 100%)",
+                        boxShadow: "0 0 8px rgba(255, 215, 0, 0.5)",
+                      }}
+                    >
+                      {index === 2 && (
+                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-white font-semibold">
+                          4:22m
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

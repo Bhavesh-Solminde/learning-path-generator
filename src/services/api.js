@@ -9,6 +9,27 @@ const api = axios.create({
   },
 });
 
+const TOKEN_STORAGE_KEYS = ["lp_auth_token", "token"];
+
+const getStoredToken = () => {
+  try {
+    if (typeof localStorage === "undefined") {
+      return null;
+    }
+
+    for (const key of TOKEN_STORAGE_KEYS) {
+      const value = localStorage.getItem(key);
+      if (value) {
+        return value;
+      }
+    }
+  } catch (error) {
+    console.error("Failed to read auth token for request", error);
+  }
+
+  return null;
+};
+
 const normalizeError = (error) => {
   const status = error.response?.status ?? 500;
   const message =
@@ -23,7 +44,7 @@ const normalizeError = (error) => {
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const token = getStoredToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
