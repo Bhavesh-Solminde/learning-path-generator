@@ -28,6 +28,7 @@
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.4",
     "react-toastify": "^11.0.5",
+    "react-window": "^2.2.3",
     "recharts": "^3.3.0"
   },
   "devDependencies": {

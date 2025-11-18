@@ -5,6 +5,18 @@ jest.mock("../CourseCard", () => ({ course }) => (
   <div data-testid="course-card">{course.name}</div>
 ));
 
+jest.mock("react-window", () => {
+  return {
+    List: ({ children, itemCount, itemData }) => (
+      <div data-testid="mocked-fixed-size-list">
+        {Array.from({ length: Math.min(itemCount, 5) }, (_, index) => (
+          <div key={index}>{children({ index, style: {}, data: itemData })}</div>
+        ))}
+      </div>
+    ),
+  };
+});
+
 describe("CourseList", () => {
   const baseCourse = {
     id: 1,
@@ -53,5 +65,25 @@ describe("CourseList", () => {
       "md:grid-cols-2",
       "lg:grid-cols-3",
     );
+  });
+
+  it("virtualizes rendering when more than 50 courses are provided", () => {
+    const largeDataset = Array.from({ length: 60 }, (_, index) => ({
+      ...baseCourse,
+      id: index + 1,
+      name: `Course ${index + 1}`,
+    }));
+
+    render(
+      <CourseList
+        courses={largeDataset}
+        viewMode="grid"
+        onAddToPath={jest.fn()}
+        getDifficultyBadge={() => "badge"}
+      />,
+    );
+
+    expect(screen.getByTestId("virtualized-course-list")).toBeInTheDocument();
+    expect(screen.getAllByTestId("course-card").length).toBeLessThan(largeDataset.length);
   });
 });
