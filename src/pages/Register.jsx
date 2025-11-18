@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -63,14 +65,13 @@ const Register = () => {
             >
               Full Name
             </label>
-            <input
+            <Input
               id="name"
               name="name"
               type="text"
               required
               value={formData.name}
               onChange={handleChange}
-              className="input-field"
               placeholder="John Doe"
             />
           </div>
@@ -82,14 +83,13 @@ const Register = () => {
             >
               Email Address
             </label>
-            <input
+            <Input
               id="email"
               name="email"
               type="email"
               required
               value={formData.email}
               onChange={handleChange}
-              className="input-field"
               placeholder="you@example.com"
             />
           </div>
@@ -101,14 +101,13 @@ const Register = () => {
             >
               Password
             </label>
-            <input
+            <Input
               id="password"
               name="password"
               type="password"
               required
               value={formData.password}
               onChange={handleChange}
-              className="input-field"
               placeholder="••••••••"
             />
           </div>
@@ -120,14 +119,13 @@ const Register = () => {
             >
               Confirm Password
             </label>
-            <input
+            <Input
               id="confirmPassword"
               name="confirmPassword"
               type="password"
               required
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="input-field"
               placeholder="••••••••"
             />
           </div>
@@ -139,24 +137,19 @@ const Register = () => {
             >
               Interests (Optional)
             </label>
-            <input
+            <Input
               id="interests"
               name="interests"
               type="text"
               value={formData.interests}
               onChange={handleChange}
-              className="input-field"
               placeholder="e.g., Web Development, AI, Data Science"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary w-full"
-          >
+          <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Creating Account..." : "Sign Up"}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-6 text-center">

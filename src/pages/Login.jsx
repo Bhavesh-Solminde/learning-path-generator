@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
 import "./Login.css";
 
 const Login = () => {
@@ -53,14 +55,13 @@ const Login = () => {
             >
               Email Address
             </label>
-            <input
+            <Input
               id="email"
               name="email"
               type="email"
               required
               value={formData.email}
               onChange={handleChange}
-              className="input-field"
               placeholder="you@example.com"
             />
           </div>
@@ -72,14 +73,13 @@ const Login = () => {
             >
               Password
             </label>
-            <input
+            <Input
               id="password"
               name="password"
               type="password"
               required
               value={formData.password}
               onChange={handleChange}
-              className="input-field"
               placeholder="••••••••"
             />
           </div>
@@ -110,13 +110,9 @@ const Login = () => {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary w-full"
-          >
+          <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Signing in..." : "Sign In"}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-6 text-center">
