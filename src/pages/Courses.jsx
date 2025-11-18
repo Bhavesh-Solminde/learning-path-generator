@@ -2,6 +2,14 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faClock,
+  faStar,
+  faTh,
+  faList,
+} from "@fortawesome/free-solid-svg-icons";
+import api from "../services/api";
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
@@ -23,78 +31,16 @@ const Courses = () => {
   }, [filters, courses]);
 
   const fetchCourses = async () => {
-    // Using mock data for now - will be replaced with Spring Boot API later
-    const mockCourses = [
-      {
-        id: 1,
-        name: "Complete React Developer",
-        category: "Web Development",
-        difficulty: "Intermediate",
-        progress: 45,
-        duration: "40 hours",
-        instructor: "John Doe",
-        rating: 4.8,
-        enrolled: true,
-      },
-      {
-        id: 2,
-        name: "Python for Data Science",
-        category: "Data Science",
-        difficulty: "Beginner",
-        progress: 0,
-        duration: "35 hours",
-        instructor: "Jane Smith",
-        rating: 4.9,
-        enrolled: false,
-      },
-      {
-        id: 3,
-        name: "Advanced Node.js",
-        category: "Backend",
-        difficulty: "Advanced",
-        progress: 80,
-        duration: "30 hours",
-        instructor: "Mike Johnson",
-        rating: 4.7,
-        enrolled: true,
-      },
-      {
-        id: 4,
-        name: "Machine Learning Fundamentals",
-        category: "AI/ML",
-        difficulty: "Intermediate",
-        progress: 20,
-        duration: "50 hours",
-        instructor: "Sarah Lee",
-        rating: 4.9,
-        enrolled: true,
-      },
-      {
-        id: 5,
-        name: "Docker & Kubernetes",
-        category: "DevOps",
-        difficulty: "Advanced",
-        progress: 0,
-        duration: "25 hours",
-        instructor: "Tom Wilson",
-        rating: 4.6,
-        enrolled: false,
-      },
-      {
-        id: 6,
-        name: "React Native Mobile Apps",
-        category: "Mobile Development",
-        difficulty: "Intermediate",
-        progress: 60,
-        duration: "45 hours",
-        instructor: "Emma Davis",
-        rating: 4.8,
-        enrolled: true,
-      },
-    ];
-    setCourses(mockCourses);
-    setFilteredCourses(mockCourses);
-    setLoading(false);
+    setLoading(true);
+    try {
+      const { data } = await api.get("/courses");
+      setCourses(data);
+      setFilteredCourses(data);
+    } catch (error) {
+      toast.error(error.message ?? "Failed to load courses");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const applyFilters = () => {
@@ -229,23 +175,23 @@ const Courses = () => {
             <div className="ml-auto flex items-end gap-2">
               <button
                 onClick={() => setViewMode("grid")}
-                className={`p-2 rounded ${
+                className={`p-2 rounded flex items-center gap-1 ${
                   viewMode === "grid"
                     ? "bg-primary text-white"
                     : "bg-muted/20 text-muted"
                 }`}
               >
-                <span>⊞</span> Grid
+                <FontAwesomeIcon icon={faTh} /> Grid
               </button>
               <button
                 onClick={() => setViewMode("list")}
-                className={`p-2 rounded ${
+                className={`p-2 rounded flex items-center gap-1 ${
                   viewMode === "list"
                     ? "bg-primary text-white"
                     : "bg-muted/20 text-muted"
                 }`}
               >
-                <span>☰</span> List
+                <FontAwesomeIcon icon={faList} /> List
               </button>
             </div>
           </div>
@@ -285,9 +231,18 @@ const Courses = () => {
                 </p>
 
                 <div className="flex items-center gap-2 text-sm text-text-secondary mb-3">
-                  <span>⏱️ {course.duration}</span>
+                  <span>
+                    <FontAwesomeIcon icon={faClock} className="mr-1" />{" "}
+                    {course.duration}
+                  </span>
                   <span>•</span>
-                  <span>⭐ {course.rating}</span>
+                  <span>
+                    <FontAwesomeIcon
+                      icon={faStar}
+                      className="mr-1 text-yellow-500"
+                    />{" "}
+                    {course.rating}
+                  </span>
                 </div>
 
                 <p className="text-sm text-text-secondary mb-4">
@@ -351,7 +306,12 @@ const Courses = () => {
                   </div>
 
                   <p className="text-text-secondary mb-2">
-                    {course.category} • {course.duration} • ⭐ {course.rating}
+                    {course.category} • {course.duration} •{" "}
+                    <FontAwesomeIcon
+                      icon={faStar}
+                      className="text-yellow-500"
+                    />{" "}
+                    {course.rating}
                   </p>
                   <p className="text-sm text-text-secondary">
                     Instructor: {course.instructor}

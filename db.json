@@ -1,0 +1,44 @@
+{
+  "courses": [
+    {
+      "id": 1,
+      "name": "Complete React Developer",
+      "category": "Web Development",
+      "difficulty": "Intermediate",
+      "progress": 45,
+      "duration": "40 hours",
+      "instructor": "John Doe",
+      "rating": 4.8,
+      "enrolled": true
+    },
+    {
+      "id": 2,
+      "name": "Python for Data Science",
+      "category": "Data Science",
+      "difficulty": "Beginner",
+      "progress": 0,
+      "duration": "35 hours",
+      "instructor": "Jane Smith",
+      "rating": 4.9,
+      "enrolled": false
+    },
+    {
+      "id": 3,
+      "name": "Advanced Node.js",
+      "category": "Backend",
+      "difficulty": "Advanced",
+      "progress": 80,
+      "duration": "30 hours",
+      "instructor": "Mike Johnson",
+      "rating": 4.7,
+      "enrolled": true
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "Brooklyn Simmons",
+      "role": "UI/UX Designer"
+    }
+  ]
+}
