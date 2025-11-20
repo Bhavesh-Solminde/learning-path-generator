@@ -12,7 +12,7 @@ const LoginForm = ({ values, onChange, onSubmit, loading }) => {
       <div>
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-xs font-semibold tracking-[0.3em] uppercase text-white/60 mb-2"
         >
           Email Address
         </label>
@@ -24,13 +24,15 @@ const LoginForm = ({ values, onChange, onSubmit, loading }) => {
           value={values.email}
           onChange={handleChange}
           placeholder="you@example.com"
+          variant="primary"
+          size="md"
         />
       </div>
 
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-xs font-semibold tracking-[0.3em] uppercase text-white/60 mb-2"
         >
           Password
         </label>
@@ -42,36 +44,30 @@ const LoginForm = ({ values, onChange, onSubmit, loading }) => {
           value={values.password}
           onChange={handleChange}
           placeholder="••••••••"
+          variant="primary"
+          size="md"
         />
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
+      <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center text-white/70">
           <input
             id="remember-me"
             name="remember-me"
             type="checkbox"
-            className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+            className="h-4 w-4 rounded border-white/20 bg-transparent text-white focus:ring-white/30"
           />
-          <label
-            htmlFor="remember-me"
-            className="ml-2 block text-sm text-gray-700"
-          >
+          <label htmlFor="remember-me" className="ml-2">
             Remember me
           </label>
         </div>
 
-        <div className="text-sm">
-          <a
-            href="#"
-            className="font-medium text-primary hover:text-primary-700"
-          >
-            Forgot password?
-          </a>
-        </div>
+        <a href="#" className="text-white/70 hover:text-white">
+          Forgot password?
+        </a>
       </div>
 
-      <Button type="submit" disabled={loading} className="w-full">
+      <Button type="submit" disabled={loading} className="w-full" size="lg" variant="primary">
         {loading ? "Signing in..." : "Sign In"}
       </Button>
     </form>

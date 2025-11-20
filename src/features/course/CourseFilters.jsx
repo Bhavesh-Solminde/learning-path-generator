@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faList, faRotateRight, faTh } from "@fortawesome/free-solid-svg-icons";
+import { faList, faRotateRight, faTh } from "../../icons";
 
 const DIFFICULTY_OPTIONS = [
   { value: "all", label: "All Levels" },
@@ -51,7 +51,7 @@ const CourseFilters = ({
   <div className="card p-6 mb-6">
     <div className="flex flex-wrap items-center gap-4">
       <div className="flex-1 min-w-[200px]">
-        <label className="block text-sm font-medium text-text-primary mb-2">
+        <label className="block text-xs font-semibold tracking-[0.3em] uppercase text-white/60 mb-2">
           Search
         </label>
         <input
@@ -81,7 +81,7 @@ const CourseFilters = ({
         },
       ].map((config) => (
         <div key={config.key}>
-          <label className="block text-sm font-medium text-text-primary mb-2">
+          <label className="block text-xs font-semibold tracking-[0.3em] uppercase text-white/60 mb-2">
             {config.label}
           </label>
           <select
@@ -99,11 +99,7 @@ const CourseFilters = ({
       ))}
 
       <div className="ml-auto flex items-end gap-2">
-        <button
-          onClick={onRefresh}
-          className="p-2 rounded flex items-center gap-1 bg-muted/10 text-text-secondary hover:bg-muted/20 transition"
-          type="button"
-        >
+        <button onClick={onRefresh} className="btn-secondary px-4 py-2 text-sm gap-2" type="button">
           <FontAwesomeIcon icon={faRotateRight} /> Refresh
         </button>
         <select
@@ -121,10 +117,8 @@ const CourseFilters = ({
           <button
             key={mode.value}
             onClick={() => onViewModeChange(mode.value)}
-            className={`p-2 rounded flex items-center gap-1 ${
-              viewMode === mode.value
-                ? "bg-primary text-white"
-                : "bg-muted/20 text-muted"
+            className={`btn-ghost px-4 py-2 gap-2 text-sm border border-transparent ${
+              viewMode === mode.value ? "bg-white/10 text-white" : "text-white/60 hover:text-white"
             }`}
           >
             <FontAwesomeIcon icon={mode.icon} /> {mode.label}

@@ -5,7 +5,7 @@ import Sidebar from "./Sidebar";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuthContext();
-  const { isSidebarOpen, closeSidebar } = useLayout();
+  const { isSidebarCollapsed } = useLayout();
 
   if (loading) {
     return (
@@ -20,9 +20,15 @@ const ProtectedRoute = ({ children }) => {
   }
 
   return (
-    <div className="flex">
-      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-      <div className="lg:ml-64 flex-1 min-h-screen bg-gray-50">{children}</div>
+    <div className="flex min-h-screen bg-[#050505] text-white">
+      <Sidebar />
+      <div
+        className={`flex-1 min-h-screen bg-transparent transition-[margin] duration-300 ease-soft ${
+          isSidebarCollapsed ? "lg:ml-24" : "lg:ml-64"
+        }`}
+      >
+        {children}
+      </div>
     </div>
   );
 };

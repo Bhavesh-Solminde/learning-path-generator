@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChartBar } from "@fortawesome/free-solid-svg-icons";
+import { faChartBar } from "../icons";
 import {
   LineChart,
   Line,
@@ -17,12 +17,20 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useAuthContext } from "../context/AuthContext";
+import { useLayout } from "../context/LayoutContext";
 import PageHeader from "../components/PageHeader";
+import PageSurface from "../components/PageSurface";
 
 const Analytics = () => {
   const { currentUser: user } = useAuthContext();
+  const { setHeaderActions, resetHeaderActions } = useLayout();
   const [analyticsData, setAnalyticsData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setHeaderActions({ showProfileButton: false });
+    return () => resetHeaderActions();
+  }, [resetHeaderActions, setHeaderActions]);
 
   useEffect(() => {
     fetchAnalyticsData();
@@ -92,17 +100,16 @@ const Analytics = () => {
   }
 
   return (
-    <div className="fade-in">
-      <PageHeader
-        title={
-          <span>
-            Progress Analytics <FontAwesomeIcon icon={faChartBar} />
-          </span>
-        }
-        showProfileButton={false}
-      />
+    <PageSurface className="fade-in">
+      <div className="px-4 py-6 md:px-8 lg:px-12 space-y-8">
+        <PageHeader
+          title={
+            <span>
+              Progress Analytics <FontAwesomeIcon icon={faChartBar} />
+            </span>
+          }
+        />
 
-      <div className="p-8">
         <div className="mb-8">
           <p className="text-text-secondary">
             Track your learning journey and identify areas for growth.
@@ -112,33 +119,25 @@ const Analytics = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="card p-6">
-            <h3 className="text-text-secondary text-sm font-medium mb-2">
-              Total Courses
-            </h3>
+            <h3 className="text-text-secondary text-sm font-medium mb-2">Total Courses</h3>
             <p className="text-3xl font-bold text-primary">
               {analyticsData?.learningStats?.totalCourses}
             </p>
           </div>
           <div className="card p-6">
-            <h3 className="text-text-secondary text-sm font-medium mb-2">
-              In Progress
-            </h3>
+            <h3 className="text-text-secondary text-sm font-medium mb-2">In Progress</h3>
             <p className="text-3xl font-bold text-gold">
               {analyticsData?.learningStats?.inProgress}
             </p>
           </div>
           <div className="card p-6">
-            <h3 className="text-text-secondary text-sm font-medium mb-2">
-              Completed
-            </h3>
+            <h3 className="text-text-secondary text-sm font-medium mb-2">Completed</h3>
             <p className="text-3xl font-bold text-accent">
               {analyticsData?.learningStats?.completed}
             </p>
           </div>
           <div className="card p-6">
-            <h3 className="text-text-secondary text-sm font-medium mb-2">
-              Not Started
-            </h3>
+            <h3 className="text-text-secondary text-sm font-medium mb-2">Not Started</h3>
             <p className="text-3xl font-bold text-text-secondary">
               {analyticsData?.learningStats?.notStarted}
             </p>
@@ -149,9 +148,7 @@ const Analytics = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Completion Trend */}
           <div className="card p-6">
-            <h2 className="text-xl font-bold text-text-primary mb-4">
-              Monthly Completion Rate
-            </h2>
+            <h2 className="text-xl font-bold text-text-primary mb-4">Monthly Completion Rate</h2>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={analyticsData?.completionTrend}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -159,21 +156,14 @@ const Analytics = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="completed"
-                  stroke="#4F46E5"
-                  strokeWidth={2}
-                />
+                <Line type="monotone" dataKey="completed" stroke="#4F46E5" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </div>
 
           {/* Performance Trend */}
           <div className="card p-6">
-            <h2 className="text-xl font-bold text-text-primary mb-4">
-              Performance Trend
-            </h2>
+            <h2 className="text-xl font-bold text-text-primary mb-4">Performance Trend</h2>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={analyticsData?.performanceTrend}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -181,12 +171,7 @@ const Analytics = () => {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="score"
-                  stroke="#10B981"
-                  strokeWidth={2}
-                />
+                <Line type="monotone" dataKey="score" stroke="#10B981" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -196,18 +181,11 @@ const Analytics = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Category Strength */}
           <div className="card p-6">
-            <h2 className="text-xl font-bold text-text-primary mb-4">
-              Category-wise Strengths
-            </h2>
+            <h2 className="text-xl font-bold text-text-primary mb-4">Category-wise Strengths</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={analyticsData?.categoryStrength}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="name"
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                />
+                <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
                 <YAxis />
                 <Tooltip />
                 <Legend />
@@ -218,9 +196,7 @@ const Analytics = () => {
 
           {/* Learning Distribution */}
           <div className="card p-6">
-            <h2 className="text-xl font-bold text-text-primary mb-4">
-              Learning Distribution
-            </h2>
+            <h2 className="text-xl font-bold text-text-primary mb-4">Learning Distribution</h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -228,18 +204,13 @@ const Analytics = () => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name}: ${(percent * 100).toFixed(0)}%`
-                  }
+                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
                 >
                   {pieData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -248,7 +219,7 @@ const Analytics = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageSurface>
   );
 };
 

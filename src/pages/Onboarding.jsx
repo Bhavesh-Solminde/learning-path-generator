@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { notifyError, notifySuccess } from "../utils/notify";
+import PageSurface from "../components/PageSurface";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLaptopCode,
@@ -24,7 +25,7 @@ import {
   faBook,
   faLayerGroup,
   faClock,
-} from "@fortawesome/free-solid-svg-icons";
+} from "../icons";
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -192,9 +193,7 @@ const Onboarding = () => {
     if (selected) {
       setPreferences({
         ...preferences,
-        selectedCategories: preferences.selectedCategories.filter(
-          (id) => id !== categoryId
-        ),
+        selectedCategories: preferences.selectedCategories.filter((id) => id !== categoryId),
       });
     } else {
       setPreferences({
@@ -209,9 +208,7 @@ const Onboarding = () => {
     if (selected) {
       setPreferences({
         ...preferences,
-        currentlyLearning: preferences.currentlyLearning.filter(
-          (t) => t !== tech
-        ),
+        currentlyLearning: preferences.currentlyLearning.filter((t) => t !== tech),
       });
     } else {
       setPreferences({
@@ -229,12 +226,12 @@ const Onboarding = () => {
         !preferences.learningStyle ||
         !preferences.dailyTimeCommitment
       ) {
-        toast.error("Please complete all fields before continuing");
+        notifyError("Please complete all fields before continuing");
         return;
       }
     } else if (step === 2) {
       if (preferences.selectedCategories.length === 0) {
-        toast.error("Please select at least one category");
+        notifyError("Please select at least one category");
         return;
       }
     }
@@ -247,7 +244,7 @@ const Onboarding = () => {
 
   const handleComplete = () => {
     if (!preferences.currentLevel) {
-      toast.error("Please select your current level");
+      notifyError("Please select your current level");
       return;
     }
 
@@ -256,7 +253,7 @@ const Onboarding = () => {
       updateUserPreferences(preferences);
     }
 
-    toast.success("Profile setup complete! ");
+    notifySuccess("Profile setup complete! ");
     navigate("/dashboard");
   };
 
@@ -265,203 +262,175 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500 to-secondary-900 flex items-center justify-center px-4 py-12">
-      <div className="card max-w-4xl w-full p-8 fade-in">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome, {user?.name || "Learner"}!
-          </h1>
-          <p className="text-gray-600">
-            Let's personalize your learning experience
-          </p>
-          <div className="flex justify-center mt-4 space-x-2">
-            {[1, 2, 3].map((s) => (
-              <div
-                key={s}
-                className={`h-2 w-16 rounded-full ${
-                  s === step
-                    ? "bg-primary"
-                    : s < step
-                    ? "bg-green-500"
-                    : "bg-gray-300"
-                }`}
-              />
-            ))}
+    <PageSurface>
+      <div className="flex min-h-screen items-center justify-center px-4 py-12">
+        <div className="card max-w-4xl w-full p-8 fade-in">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Welcome, {user?.name || "Learner"}!
+            </h1>
+            <p className="text-gray-600">Let's personalize your learning experience</p>
+            <div className="flex justify-center mt-4 space-x-2">
+              {[1, 2, 3].map((s) => (
+                <div
+                  key={s}
+                  className={`h-2 w-16 rounded-full ${
+                    s === step ? "bg-primary" : s < step ? "bg-green-500" : "bg-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+            <p className="text-sm text-gray-500 mt-2">Step {step} of 3</p>
           </div>
-          <p className="text-sm text-gray-500 mt-2">Step {step} of 3</p>
-        </div>
 
-        {/* Step 1: Learning Preferences */}
-        {step === 1 && (
-          <div className="space-y-6 animate-fadeIn">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                What's your learning goal?
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {learningGoals.map((goal) => (
-                  <button
-                    key={goal.id}
-                    onClick={() => handleSelection("learningGoal", goal.id)}
-                    className={`p-4 rounded-lg border-2 text-left transition-all ${
-                      preferences.learningGoal === goal.id
-                        ? "border-primary bg-primary-50"
-                        : "border-gray-200 hover:border-primary-300"
-                    }`}
-                  >
-                    <div className="flex items-center mb-2">
+          {/* Step 1: Learning Preferences */}
+          {step === 1 && (
+            <div className="space-y-6 animate-fadeIn">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  What's your learning goal?
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {learningGoals.map((goal) => (
+                    <button
+                      key={goal.id}
+                      onClick={() => handleSelection("learningGoal", goal.id)}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${
+                        preferences.learningGoal === goal.id
+                          ? "border-primary bg-primary-50"
+                          : "border-gray-200 hover:border-primary-300"
+                      }`}
+                    >
+                      <div className="flex items-center mb-2">
+                        <FontAwesomeIcon icon={goal.icon} className="text-2xl text-primary mr-3" />
+                        <div className="text-lg font-semibold">{goal.label}</div>
+                      </div>
+                      <div className="text-sm text-gray-600">{goal.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  What's your current level?
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {difficulties.map((level) => (
+                    <button
+                      key={level.id}
+                      onClick={() => handleSelection("preferredDifficulty", level.id)}
+                      className={`p-4 rounded-xl border-2 text-center transition-all ${
+                        preferences.preferredDifficulty === level.id
+                          ? "border-primary bg-primary-50"
+                          : "border-gray-200 hover:border-primary-300"
+                      }`}
+                    >
+                      <FontAwesomeIcon icon={level.icon} className="text-3xl text-primary mb-2" />
+                      <div className="text-lg font-semibold mb-1">{level.label}</div>
+                      <div className="text-sm text-gray-600">{level.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">How do you learn best?</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {learningStyles.map((style) => (
+                    <button
+                      key={style.id}
+                      onClick={() => handleSelection("learningStyle", style.id)}
+                      className={`p-4 rounded-xl border-2 text-left transition-all relative ${
+                        preferences.learningStyle === style.id
+                          ? "border-primary bg-primary-50"
+                          : "border-gray-200 hover:border-primary-300"
+                      }`}
+                    >
+                      {style.id === "hybrid" && (
+                        <span className="absolute -top-3 -right-4 bg-gold text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                          Best Choice
+                        </span>
+                      )}
+                      <div className="flex items-center mb-2">
+                        <FontAwesomeIcon icon={style.icon} className="text-2xl text-primary mr-3" />
+                        <div className="text-lg font-semibold">{style.label}</div>
+                      </div>
+                      <div className="text-sm text-gray-600">{style.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Daily time commitment?</h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {timeCommitments.map((time) => (
+                    <button
+                      key={time.id}
+                      onClick={() => handleSelection("dailyTimeCommitment", time.value)}
+                      className={`p-4 rounded-xl border-2 text-center transition-all ${
+                        preferences.dailyTimeCommitment === time.value
+                          ? "border-primary bg-primary-50"
+                          : "border-gray-200 hover:border-primary-300"
+                      }`}
+                    >
+                      <FontAwesomeIcon icon={time.icon} className="text-2xl text-primary mb-2" />
+                      <div className="font-semibold">{time.label}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Interests */}
+          {step === 2 && (
+            <div className="space-y-6 animate-fadeIn">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  What topics interest you? (Select all that apply)
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => toggleCategory(category.id)}
+                      className={`p-4 rounded-xl border-2 text-left transition-all ${
+                        preferences.selectedCategories.includes(category.id)
+                          ? "border-primary bg-primary-50"
+                          : "border-gray-200 hover:border-primary-300"
+                      }`}
+                    >
                       <FontAwesomeIcon
-                        icon={goal.icon}
-                        className="text-2xl text-primary mr-3"
+                        icon={categoryIconMap[category.icon]}
+                        className="text-3xl text-primary mb-2"
                       />
-                      <div className="text-lg font-semibold">{goal.label}</div>
-                    </div>
-                    <div className="text-sm text-gray-600">{goal.desc}</div>
-                  </button>
-                ))}
+                      <div className="font-semibold">{category.label}</div>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 mt-3">
+                  Selected: {preferences.selectedCategories.length} categories
+                </p>
               </div>
             </div>
+          )}
 
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                What's your current level?
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {difficulties.map((level) => (
-                  <button
-                    key={level.id}
-                    onClick={() =>
-                      handleSelection("preferredDifficulty", level.id)
-                    }
-                    className={`p-4 rounded-lg border-2 text-center transition-all ${
-                      preferences.preferredDifficulty === level.id
-                        ? "border-primary bg-primary-50"
-                        : "border-gray-200 hover:border-primary-300"
-                    }`}
-                  >
-                    <FontAwesomeIcon
-                      icon={level.icon}
-                      className="text-3xl text-primary mb-2"
-                    />
-                    <div className="text-lg font-semibold mb-1">
-                      {level.label}
-                    </div>
-                    <div className="text-sm text-gray-600">{level.desc}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                How do you learn best?
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {learningStyles.map((style) => (
-                  <button
-                    key={style.id}
-                    onClick={() => handleSelection("learningStyle", style.id)}
-                    className={`p-4 rounded-lg border-2 text-left transition-all relative ${
-                      preferences.learningStyle === style.id
-                        ? "border-primary bg-primary-50"
-                        : "border-gray-200 hover:border-primary-300"
-                    }`}
-                  >
-                    {style.id === "hybrid" && (
-                      <span className="absolute -top-3 -right-4 bg-gold text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                        Best Choice
-                      </span>
-                    )}
-                    <div className="flex items-center mb-2">
-                      <FontAwesomeIcon
-                        icon={style.icon}
-                        className="text-2xl text-primary mr-3"
-                      />
-                      <div className="text-lg font-semibold">{style.label}</div>
-                    </div>
-                    <div className="text-sm text-gray-600">{style.desc}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Daily time commitment?
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {timeCommitments.map((time) => (
-                  <button
-                    key={time.id}
-                    onClick={() =>
-                      handleSelection("dailyTimeCommitment", time.value)
-                    }
-                    className={`p-4 rounded-lg border-2 text-center transition-all ${
-                      preferences.dailyTimeCommitment === time.value
-                        ? "border-primary bg-primary-50"
-                        : "border-gray-200 hover:border-primary-300"
-                    }`}
-                  >
-                    <FontAwesomeIcon
-                      icon={time.icon}
-                      className="text-2xl text-primary mb-2"
-                    />
-                    <div className="font-semibold">{time.label}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Interests */}
-        {step === 2 && (
-          <div className="space-y-6 animate-fadeIn">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                What topics interest you? (Select all that apply)
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => toggleCategory(category.id)}
-                    className={`p-4 rounded-lg border-2 text-left transition-all ${
-                      preferences.selectedCategories.includes(category.id)
-                        ? "border-primary bg-primary-50"
-                        : "border-gray-200 hover:border-primary-300"
-                    }`}
-                  >
-                    <FontAwesomeIcon
-                      icon={categoryIconMap[category.icon]}
-                      className="text-3xl text-primary mb-2"
-                    />
-                    <div className="font-semibold">{category.label}</div>
-                  </button>
-                ))}
-              </div>
-              <p className="text-sm text-gray-500 mt-3">
-                Selected: {preferences.selectedCategories.length} categories
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Current Status */}
-        {step === 3 && (
-          <div className="space-y-6 animate-fadeIn">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                What's your current programming level?
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {["Just Starting", "Some Experience", "Professional"].map(
-                  (level) => (
+          {/* Step 3: Current Status */}
+          {step === 3 && (
+            <div className="space-y-6 animate-fadeIn">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  What's your current programming level?
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {["Just Starting", "Some Experience", "Professional"].map((level) => (
                     <button
                       key={level}
                       onClick={() => handleSelection("currentLevel", level)}
-                      className={`p-4 rounded-lg border-2 text-center transition-all ${
+                      className={`p-4 rounded-xl border-2 text-center transition-all ${
                         preferences.currentLevel === level
                           ? "border-primary bg-primary-50"
                           : "border-gray-200 hover:border-primary-300"
@@ -469,81 +438,78 @@ const Onboarding = () => {
                     >
                       <div className="font-semibold">{level}</div>
                     </button>
-                  )
-                )}
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  How many courses have you completed?
+                </h2>
+                <input
+                  type="number"
+                  min="0"
+                  value={preferences.completedCourses}
+                  onChange={(e) =>
+                    handleSelection("completedCourses", parseInt(e.target.value) || 0)
+                  }
+                  className="input-field max-w-xs"
+                  placeholder="e.g., 5"
+                />
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  What are you currently learning? (Optional)
+                </h2>
+                <div className="flex flex-wrap gap-2">
+                  {currentlyLearningOptions.map((tech) => (
+                    <button
+                      key={tech}
+                      onClick={() => toggleLearning(tech)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        preferences.currentlyLearning.includes(tech)
+                          ? "bg-primary text-white"
+                          : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      }`}
+                    >
+                      {tech}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
+          )}
 
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                How many courses have you completed?
-              </h2>
-              <input
-                type="number"
-                min="0"
-                value={preferences.completedCourses}
-                onChange={(e) =>
-                  handleSelection(
-                    "completedCourses",
-                    parseInt(e.target.value) || 0
-                  )
-                }
-                className="input-field max-w-xs"
-                placeholder="e.g., 5"
-              />
+          {/* Navigation Buttons */}
+          <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
+            <button
+              onClick={skipOnboarding}
+              className="text-gray-600 hover:text-gray-900 font-medium"
+            >
+              Skip for now
+            </button>
+
+            <div className="flex gap-3">
+              {step > 1 && (
+                <button onClick={prevStep} className="btn-secondary">
+                  ← Back
+                </button>
+              )}
+              {step < 3 ? (
+                <button onClick={nextStep} className="btn-primary">
+                  Continue →
+                </button>
+              ) : (
+                <button onClick={handleComplete} className="btn-primary">
+                  Complete Setup
+                </button>
+              )}
             </div>
-
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                What are you currently learning? (Optional)
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {currentlyLearningOptions.map((tech) => (
-                  <button
-                    key={tech}
-                    onClick={() => toggleLearning(tech)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      preferences.currentlyLearning.includes(tech)
-                        ? "bg-primary text-white"
-                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
-                  >
-                    {tech}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Navigation Buttons */}
-        <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
-          <button
-            onClick={skipOnboarding}
-            className="text-gray-600 hover:text-gray-900 font-medium"
-          >
-            Skip for now
-          </button>
-
-          <div className="flex gap-3">
-            {step > 1 && (
-              <button onClick={prevStep} className="btn-secondary">
-                ← Back
-              </button>
-            )}
-            {step < 3 ? (
-              <button onClick={nextStep} className="btn-primary">
-                Continue →
-              </button>
-            ) : (
-              <button onClick={handleComplete} className="btn-primary">
-                Complete Setup
-              </button>
-            )}
           </div>
         </div>
       </div>
-    </div>
+    </PageSurface>
   );
 };
 

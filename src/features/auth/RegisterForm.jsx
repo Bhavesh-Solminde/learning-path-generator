@@ -12,7 +12,7 @@ const RegisterForm = ({ values, onChange, onSubmit, loading }) => {
       <div>
         <label
           htmlFor="name"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-xs font-semibold tracking-[0.3em] uppercase text-white/60 mb-2"
         >
           Full Name
         </label>
@@ -24,13 +24,15 @@ const RegisterForm = ({ values, onChange, onSubmit, loading }) => {
           value={values.name}
           onChange={handleChange}
           placeholder="John Doe"
+          variant="primary"
+          size="md"
         />
       </div>
 
       <div>
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-xs font-semibold tracking-[0.3em] uppercase text-white/60 mb-2"
         >
           Email Address
         </label>
@@ -42,13 +44,15 @@ const RegisterForm = ({ values, onChange, onSubmit, loading }) => {
           value={values.email}
           onChange={handleChange}
           placeholder="you@example.com"
+          variant="primary"
+          size="md"
         />
       </div>
 
       <div>
         <label
           htmlFor="password"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-xs font-semibold tracking-[0.3em] uppercase text-white/60 mb-2"
         >
           Password
         </label>
@@ -60,13 +64,15 @@ const RegisterForm = ({ values, onChange, onSubmit, loading }) => {
           value={values.password}
           onChange={handleChange}
           placeholder="••••••••"
+          variant="primary"
+          size="md"
         />
       </div>
 
       <div>
         <label
           htmlFor="confirmPassword"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-xs font-semibold tracking-[0.3em] uppercase text-white/60 mb-2"
         >
           Confirm Password
         </label>
@@ -78,13 +84,15 @@ const RegisterForm = ({ values, onChange, onSubmit, loading }) => {
           value={values.confirmPassword}
           onChange={handleChange}
           placeholder="••••••••"
+          variant="primary"
+          size="md"
         />
       </div>
 
       <div>
         <label
           htmlFor="interests"
-          className="block text-sm font-medium text-gray-700 mb-2"
+          className="block text-xs font-semibold tracking-[0.3em] uppercase text-white/60 mb-2"
         >
           Interests (Optional)
         </label>
@@ -95,10 +103,12 @@ const RegisterForm = ({ values, onChange, onSubmit, loading }) => {
           value={values.interests}
           onChange={handleChange}
           placeholder="e.g., Web Development, AI, Data Science"
+          variant="secondary"
+          size="md"
         />
       </div>
 
-      <Button type="submit" disabled={loading} className="w-full">
+      <Button type="submit" disabled={loading} className="w-full" size="lg" variant="primary">
         {loading ? "Creating Account..." : "Sign Up"}
       </Button>
     </form>

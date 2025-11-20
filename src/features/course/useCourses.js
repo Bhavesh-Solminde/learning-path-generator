@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useFetch from "../../hooks/useFetch";
+import mockCourses from "../../data/mockCourses";
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
@@ -14,6 +15,7 @@ const useCourses = ({ pageSize: initialPageSize = DEFAULT_PAGE_SIZE } = {}) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(initialPageSize);
+  const [isOffline, setIsOffline] = useState(false);
 
   const apiBase = import.meta.env.VITE_API_URL || "http://localhost:3000";
   const { data, loading, error, refetch } = useFetch(`${apiBase}/courses`, {
@@ -21,11 +23,19 @@ const useCourses = ({ pageSize: initialPageSize = DEFAULT_PAGE_SIZE } = {}) => {
   });
 
   useEffect(() => {
-    if (Array.isArray(data)) {
+    if (Array.isArray(data) && data.length) {
       setCourses(data);
       setWorkingSet(data);
+      setIsOffline(false);
+      return;
     }
-  }, [data]);
+
+    if (error && !isOffline) {
+      setCourses(mockCourses);
+      setWorkingSet(mockCourses);
+      setIsOffline(true);
+    }
+  }, [data, error, isOffline]);
 
   useEffect(() => {
     setPage(1);
@@ -39,8 +49,7 @@ const useCourses = ({ pageSize: initialPageSize = DEFAULT_PAGE_SIZE } = {}) => {
     }
 
     return workingSet.filter((course) => {
-      const lookup =
-        `${course.name} ${course.category} ${course.instructor}`.toLowerCase();
+      const lookup = `${course.name} ${course.category} ${course.instructor}`.toLowerCase();
       return lookup.includes(normalizedQuery);
     });
   }, [normalizedQuery, workingSet]);
@@ -72,7 +81,7 @@ const useCourses = ({ pageSize: initialPageSize = DEFAULT_PAGE_SIZE } = {}) => {
         return clamp(target, 1, totalPages);
       });
     },
-    [totalPages]
+    [totalPages],
   );
 
   const nextPage = useCallback(() => {
@@ -89,14 +98,10 @@ const useCourses = ({ pageSize: initialPageSize = DEFAULT_PAGE_SIZE } = {}) => {
 
   const markCourseEnrolled = useCallback((courseId) => {
     setCourses((prev) =>
-      prev.map((course) =>
-        course.id === courseId ? { ...course, enrolled: true } : course
-      )
+      prev.map((course) => (course.id === courseId ? { ...course, enrolled: true } : course)),
     );
     setWorkingSet((prev) =>
-      prev.map((course) =>
-        course.id === courseId ? { ...course, enrolled: true } : course
-      )
+      prev.map((course) => (course.id === courseId ? { ...course, enrolled: true } : course)),
     );
   }, []);
 
@@ -104,6 +109,7 @@ const useCourses = ({ pageSize: initialPageSize = DEFAULT_PAGE_SIZE } = {}) => {
     courses,
     loading,
     error,
+    isOffline,
     refetch,
     paginatedCourses,
     totalPages,

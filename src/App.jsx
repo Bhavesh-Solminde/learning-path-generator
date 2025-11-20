@@ -13,6 +13,7 @@ import CourseLearning from "./pages/CourseLearning";
 import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import LoadingDemo from "./pages/LoadingDemo";
+import LandingPage from "./pages/landingPage";
 
 // Components
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -23,18 +24,16 @@ const Profile = lazy(() => import("./pages/Profile"));
 
 const SuspenseFallback = () => (
   <div className="flex min-h-[200px] items-center justify-center py-10">
-    <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-primary"></div>
+    <div className="h-10 w-10 animate-spin rounded-full border-b-2 border-white"></div>
   </div>
 );
-
-const withSuspense = (node) => <Suspense fallback={<SuspenseFallback />}>{node}</Suspense>;
 
 function App() {
   return (
     <AuthProvider>
       <LayoutProvider>
         <Router>
-          <div className="min-h-screen bg-gray-50">
+          <div className="min-h-screen bg-night-soft text-white">
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
@@ -54,11 +53,23 @@ function App() {
               {/* Protected Routes */}
               <Route
                 path="/dashboard"
-                element={<ProtectedRoute>{withSuspense(<Dashboard />)}</ProtectedRoute>}
+                element={
+                  <ProtectedRoute>
+                    <Suspense fallback={<SuspenseFallback />}>
+                      <Dashboard />
+                    </Suspense>
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path="/courses"
-                element={<ProtectedRoute>{withSuspense(<CoursesContainer />)}</ProtectedRoute>}
+                element={
+                  <ProtectedRoute>
+                    <Suspense fallback={<SuspenseFallback />}>
+                      <CoursesContainer />
+                    </Suspense>
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path="/course/:courseId"
@@ -78,7 +89,13 @@ function App() {
               />
               <Route
                 path="/profile"
-                element={<ProtectedRoute>{withSuspense(<Profile />)}</ProtectedRoute>}
+                element={
+                  <ProtectedRoute>
+                    <Suspense fallback={<SuspenseFallback />}>
+                      <Profile />
+                    </Suspense>
+                  </ProtectedRoute>
+                }
               />
               <Route
                 path="/settings"
@@ -90,7 +107,7 @@ function App() {
               />
 
               {/* Default Route */}
-              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/" element={<LandingPage />} />
               <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
 
@@ -105,7 +122,7 @@ function App() {
               pauseOnFocusLoss
               draggable
               pauseOnHover
-              theme="light"
+              theme="dark"
             />
           </div>
         </Router>

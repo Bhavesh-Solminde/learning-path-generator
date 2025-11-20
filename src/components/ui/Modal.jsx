@@ -1,8 +1,8 @@
 import { createPortal } from "react-dom";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Button from "./Button";
 import Icon from "./Icon";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faXmark } from "../../icons";
 
 /**
  * Lightweight modal primitive that renders children inside a centered panel.
@@ -13,7 +13,18 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
  * @param {string} [props.className] - Utility classes appended to the dialog container.
  * @param {string} [props.ariaLabelledBy] - ID of the heading when the modal needs a custom label source.
  * @param {string} [props.ariaDescribedBy] - ID describing additional context for assistive tech.
+ * @param {boolean} [props.closeOnOverlayClick=true] - Controls whether tapping the scrim closes the modal.
+ * @param {boolean} [props.closeOnEscape=true] - Controls whether the Escape key dismisses the modal.
  */
+const FOCUSABLE_SELECTORS = [
+  "a[href]",
+  "button:not([disabled])",
+  "textarea:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+
 const Modal = ({
   isOpen,
   onClose,
@@ -22,7 +33,12 @@ const Modal = ({
   className = "",
   ariaLabelledBy,
   ariaDescribedBy,
+  closeOnOverlayClick = true,
+  closeOnEscape = true,
 }) => {
+  const dialogRef = useRef(null);
+  const previouslyFocusedElement = useRef(null);
+
   useEffect(() => {
     if (!isOpen) return;
     const originalOverflow = document.body.style.overflow;
@@ -32,27 +48,105 @@ const Modal = ({
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    previouslyFocusedElement.current = document.activeElement;
+    const focusable = dialogRef.current?.querySelectorAll(FOCUSABLE_SELECTORS);
+    const firstFocusable = focusable && focusable[0];
+
+    if (firstFocusable) {
+      firstFocusable.focus();
+    } else {
+      dialogRef.current?.focus();
+    }
+
+    return () => {
+      if (
+        previouslyFocusedElement.current &&
+        typeof previouslyFocusedElement.current.focus === "function"
+      ) {
+        previouslyFocusedElement.current.focus();
+      }
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || !closeOnEscape) {
+      return;
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose?.();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [closeOnEscape, isOpen, onClose]);
+
+  const handleTrapFocus = useCallback((event) => {
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const focusable = dialogRef.current?.querySelectorAll(FOCUSABLE_SELECTORS);
+    if (!focusable || focusable.length === 0) {
+      event.preventDefault();
+      dialogRef.current?.focus();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey) {
+      if (document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      }
+    } else if (document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }, []);
+
+  const handleOverlayInteraction = (event) => {
+    if (!closeOnOverlayClick) {
+      return;
+    }
+
+    if (event.target === event.currentTarget) {
+      onClose?.();
+    }
+  };
+
   if (!isOpen) {
     return null;
   }
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-lg px-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={ariaLabelledBy}
       aria-describedby={ariaDescribedBy}
+      onMouseDown={handleOverlayInteraction}
     >
       <div
-        className={`card w-full max-w-lg bg-white shadow-2xl animate-in fade-in ${className}`.trim()}
+        ref={dialogRef}
+        className={`w-full max-w-xl rounded-[32px] border border-white/10 bg-night-soft/80 text-white shadow-glass backdrop-blur-3xl animate-in fade-in ${className}`.trim()}
+        tabIndex={-1}
+        onKeyDown={handleTrapFocus}
       >
-        <div className="flex items-center justify-between border-b border-muted/40 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
           {title ? (
-            <h2
-              id={ariaLabelledBy}
-              className="text-lg font-semibold text-gray-900"
-            >
+            <h2 id={ariaLabelledBy} className="text-lg font-semibold text-white">
               {title}
             </h2>
           ) : (
@@ -61,7 +155,9 @@ const Modal = ({
           <Button
             type="button"
             onClick={onClose}
-            className="btn-secondary h-9 w-9 rounded-full bg-muted/20 text-gray-600"
+            variant="ghost"
+            size="sm"
+            className="h-10 w-10 rounded-full border border-white/10 bg-white/5 text-white hover:bg-white/15"
             aria-label="Close modal"
           >
             <Icon icon={faXmark} aria-hidden="true" />
@@ -70,7 +166,7 @@ const Modal = ({
         <div className="px-6 py-5">{children}</div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 

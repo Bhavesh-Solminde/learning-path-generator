@@ -1,6 +1,11 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
 const LayoutContext = createContext();
+
+const DEFAULT_HEADER_ACTIONS = {
+  showProfileButton: true,
+  onProfileClick: undefined,
+};
 
 export const useLayout = () => {
   const context = useContext(LayoutContext);
@@ -12,10 +17,24 @@ export const useLayout = () => {
 
 export const LayoutProvider = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [headerActions, setHeaderActionsState] = useState(() => ({
+    ...DEFAULT_HEADER_ACTIONS,
+  }));
 
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
   const closeSidebar = () => setIsSidebarOpen(false);
   const openSidebar = () => setIsSidebarOpen(true);
+  const toggleSidebarCollapsed = () => setIsSidebarCollapsed((prev) => !prev);
+  const setHeaderActions = useCallback((actions = {}) => {
+    setHeaderActionsState({
+      ...DEFAULT_HEADER_ACTIONS,
+      ...actions,
+    });
+  }, []);
+  const resetHeaderActions = useCallback(() => {
+    setHeaderActionsState({ ...DEFAULT_HEADER_ACTIONS });
+  }, []);
 
   return (
     <LayoutContext.Provider
@@ -24,6 +43,11 @@ export const LayoutProvider = ({ children }) => {
         toggleSidebar,
         closeSidebar,
         openSidebar,
+        isSidebarCollapsed,
+        toggleSidebarCollapsed,
+        headerActions,
+        setHeaderActions,
+        resetHeaderActions,
       }}
     >
       {children}

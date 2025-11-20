@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "react-toastify";
+import { useLayout } from "../context/LayoutContext";
+import { notifyError, notifySuccess } from "../utils/notify";
 import PageHeader from "../components/PageHeader";
+import PageSurface from "../components/PageSurface";
 import CourseFilters from "../features/course/CourseFilters";
 import CourseList from "../features/course/CourseList";
 import useCourses from "../features/course/useCourses";
 
 const CoursesContainer = () => {
+  const { setHeaderActions, resetHeaderActions } = useLayout();
   const [filters, setFilters] = useState({
     difficulty: "all",
     category: "all",
@@ -18,6 +21,7 @@ const CoursesContainer = () => {
     courses,
     loading,
     error,
+    isOffline,
     refetch,
     paginatedCourses,
     totalPages,
@@ -34,7 +38,7 @@ const CoursesContainer = () => {
 
   useEffect(() => {
     if (error) {
-      toast.error(error.message ?? "Failed to load courses");
+      notifyError(error.message ?? "Failed to load courses");
     }
   }, [error]);
 
@@ -43,14 +47,12 @@ const CoursesContainer = () => {
 
     if (filters.difficulty !== "all") {
       filtered = filtered.filter(
-        (course) => course.difficulty.toLowerCase() === filters.difficulty
+        (course) => course.difficulty.toLowerCase() === filters.difficulty,
       );
     }
 
     if (filters.category !== "all") {
-      filtered = filtered.filter(
-        (course) => course.category === filters.category
-      );
+      filtered = filtered.filter((course) => course.category === filters.category);
     }
 
     if (filters.progress !== "all") {
@@ -75,6 +77,11 @@ const CoursesContainer = () => {
     }
   }, [filteredCourses.length, pageSizePreference, setPageSize]);
 
+  useEffect(() => {
+    setHeaderActions({ showProfileButton: false });
+    return () => resetHeaderActions();
+  }, [resetHeaderActions, setHeaderActions]);
+
   const handleFilterChange = (filterType, value) => {
     setFilters((prev) => ({ ...prev, [filterType]: value }));
   };
@@ -91,22 +98,22 @@ const CoursesContainer = () => {
   const getDifficultyColor = useCallback((difficulty) => {
     switch (difficulty?.toLowerCase()) {
       case "beginner":
-        return "bg-accent/10 text-accent";
+        return "bg-primary/10 text-primary-700 border border-primary/20";
       case "intermediate":
-        return "bg-gold/10 text-gold";
+        return "bg-gold/10 text-gold border border-gold/30";
       case "advanced":
-        return "bg-error/10 text-error";
+        return "bg-rose-100 text-rose-600 border border-rose-200";
       default:
-        return "bg-muted/20 text-muted";
+        return "bg-surface-muted text-muted border border-border-subtle";
     }
   }, []);
 
   const handleAddToPath = useCallback(
     (courseId) => {
-      toast.success("Course added to your learning path!");
+      notifySuccess("Course added to your learning path!");
       markCourseEnrolled(courseId);
     },
-    [markCourseEnrolled]
+    [markCourseEnrolled],
   );
 
   if (loading) {
@@ -118,10 +125,10 @@ const CoursesContainer = () => {
   }
 
   return (
-    <div className="fade-in">
-      <PageHeader title="Courses" showProfileButton={false} />
+    <PageSurface className="fade-in">
+      <div className="px-4 py-6 md:px-8 lg:px-12 max-w-7xl mx-auto space-y-8">
+        <PageHeader title="Courses" showActions={false} />
 
-      <div className="p-8">
         <CourseFilters
           filters={filters}
           onFilterChange={handleFilterChange}
@@ -134,11 +141,20 @@ const CoursesContainer = () => {
           onPageSizeChange={handlePageSizeChange}
         />
 
+        {isOffline && (
+          <div className="card border border-amber-300/40 bg-white/5 text-white mb-6">
+            <p className="text-sm">
+              The course service could not be reached, so we loaded a local sample catalog instead.
+              Start the mock API with <code>npm run json:dev</code> for live data.
+            </p>
+          </div>
+        )}
+
         {totalPages > 1 && (
           <div className="card p-4 flex items-center justify-end gap-3 mb-6">
             <button
               onClick={prevPage}
-              className="btn-secondary px-4 py-2 rounded disabled:opacity-50"
+              className="btn-secondary px-4 py-2 rounded-xl disabled:opacity-50"
               disabled={page === 1}
               type="button"
             >
@@ -149,7 +165,7 @@ const CoursesContainer = () => {
             </span>
             <button
               onClick={nextPage}
-              className="btn-primary px-4 py-2 rounded"
+              className="btn-primary px-4 py-2 rounded-xl"
               type="button"
               disabled={page === totalPages}
             >
@@ -171,7 +187,7 @@ const CoursesContainer = () => {
           getDifficultyBadge={getDifficultyColor}
         />
       </div>
-    </div>
+    </PageSurface>
   );
 };
 
