@@ -1,9 +1,11 @@
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import Sidebar from './Sidebar';
+import { Navigate } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContext";
+import { useLayout } from "../context/LayoutContext";
+import Sidebar from "./Sidebar";
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuthContext();
+  const { isSidebarCollapsed } = useLayout();
 
   if (loading) {
     return (
@@ -18,9 +20,13 @@ const ProtectedRoute = ({ children }) => {
   }
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-[#050505] text-white">
       <Sidebar />
-      <div className="ml-64 flex-1 min-h-screen bg-gray-50">
+      <div
+        className={`flex-1 min-h-screen bg-transparent transition-[margin] duration-300 ease-soft ${
+          isSidebarCollapsed ? "lg:ml-24" : "lg:ml-64"
+        }`}
+      >
         {children}
       </div>
     </div>

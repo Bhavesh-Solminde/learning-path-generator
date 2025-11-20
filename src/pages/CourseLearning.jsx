@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { useAuthContext } from "../context/AuthContext";
+import { notifySuccess } from "../utils/notify";
+import PageSurface from "../components/PageSurface";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faClock, faChartBar, faPlay, faFilePdf, faCode, faFileArchive, faLink } from "../icons";
 
 const CourseLearning = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthContext();
 
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -181,8 +184,7 @@ const CourseLearning = () => {
         {
           id: 1,
           title: "Build a Task Manager App",
-          description:
-            "Apply React patterns to build a full-featured task manager",
+          description: "Apply React patterns to build a full-featured task manager",
           difficulty: "Intermediate",
           estimatedTime: "8 hours",
           completed: false,
@@ -208,9 +210,7 @@ const CourseLearning = () => {
     setCompletedLessons(completed);
 
     // Set first incomplete lesson as current
-    const firstIncomplete = mockCourse.modules
-      .flatMap((m) => m.lessons)
-      .find((l) => !l.completed);
+    const firstIncomplete = mockCourse.modules.flatMap((m) => m.lessons).find((l) => !l.completed);
     if (firstIncomplete) {
       setCurrentLesson(firstIncomplete);
     }
@@ -221,13 +221,11 @@ const CourseLearning = () => {
   const handleLessonComplete = (lessonId) => {
     if (!completedLessons.includes(lessonId)) {
       setCompletedLessons([...completedLessons, lessonId]);
-      toast.success("Lesson marked as complete! 🎉");
+      notifySuccess("Lesson marked as complete! 🎉");
 
       // Update progress
       const totalLessons = course.modules.flatMap((m) => m.lessons).length;
-      const newProgress = Math.round(
-        ((completedLessons.length + 1) / totalLessons) * 100
-      );
+      const newProgress = Math.round(((completedLessons.length + 1) / totalLessons) * 100);
       setCourse({ ...course, progress: newProgress });
     }
   };
@@ -238,24 +236,24 @@ const CourseLearning = () => {
   };
 
   const saveNotes = () => {
-    toast.success("Notes saved successfully!");
+    notifySuccess("Notes saved successfully!");
     setShowNotes(false);
   };
 
   const getResourceIcon = (type) => {
     switch (type) {
       case "pdf":
-        return "📄";
+        return <FontAwesomeIcon icon={faFilePdf} className="text-red-500" />;
       case "code":
-        return "💻";
+        return <FontAwesomeIcon icon={faCode} className="text-blue-500" />;
       case "presentation":
-        return "📊";
+        return <FontAwesomeIcon icon={faChartBar} className="text-green-500" />;
       case "zip":
-        return "📦";
+        return <FontAwesomeIcon icon={faFileArchive} className="text-yellow-600" />;
       case "link":
-        return "🔗";
+        return <FontAwesomeIcon icon={faLink} className="text-primary" />;
       default:
-        return "📁";
+        return <FontAwesomeIcon icon={faFilePdf} className="text-gray-500" />;
     }
   };
 
@@ -271,9 +269,7 @@ const CourseLearning = () => {
     return (
       <div className="p-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Course not found
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Course not found</h1>
           <Link to="/courses" className="btn-primary">
             Back to Courses
           </Link>
@@ -283,37 +279,30 @@ const CourseLearning = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageSurface>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-night-soft/80 backdrop-blur-2xl border-b border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigate("/dashboard")}
-                className="text-gray-600 hover:text-gray-900"
+                className="text-white/60 hover:text-white"
               >
                 ← Back to Dashboard
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {course.name}
-                </h1>
-                <p className="text-sm text-gray-600">by {course.instructor}</p>
+                <h1 className="text-2xl font-bold text-white">{course.name}</h1>
+                <p className="text-sm text-white/60">by {course.instructor}</p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-gray-600 mb-1">Your Progress</div>
+              <div className="text-sm text-white/60 mb-1">Your Progress</div>
               <div className="flex items-center space-x-2">
                 <div className="w-32 progress-bar">
-                  <div
-                    className="progress-bar-fill"
-                    style={{ width: `${course.progress}%` }}
-                  ></div>
+                  <div className="progress-bar-fill" style={{ width: `${course.progress}%` }}></div>
                 </div>
-                <span className="text-sm font-semibold text-secondary">
-                  {course.progress}%
-                </span>
+                <span className="text-sm font-semibold text-white">{course.progress}%</span>
               </div>
             </div>
           </div>
@@ -326,7 +315,7 @@ const CourseLearning = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Tabs */}
             <div className="card">
-              <div className="border-b border-gray-200">
+              <div className="border-b border-white/10">
                 <nav className="flex space-x-8 px-6" aria-label="Tabs">
                   {["overview", "video", "resources", "projects"].map((tab) => (
                     <button
@@ -334,8 +323,8 @@ const CourseLearning = () => {
                       onClick={() => setActiveTab(tab)}
                       className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${
                         activeTab === tab
-                          ? "border-primary text-primary"
-                          : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                          ? "border-white text-white"
+                          : "border-transparent text-white/50 hover:text-white hover:border-white/20"
                       }`}
                     >
                       {tab}
@@ -348,27 +337,21 @@ const CourseLearning = () => {
                 {/* Overview Tab */}
                 {activeTab === "overview" && (
                   <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-900">
-                      About this course
-                    </h2>
+                    <h2 className="text-xl font-bold text-gray-900">About this course</h2>
                     <p className="text-gray-700">{course.description}</p>
 
                     <div className="grid grid-cols-3 gap-4 mt-6">
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="text-sm text-gray-600">Duration</div>
-                        <div className="text-lg font-semibold text-gray-900">
-                          {course.duration}
-                        </div>
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                        <div className="text-sm text-white/60">Duration</div>
+                        <div className="text-lg font-semibold text-white">{course.duration}</div>
                       </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="text-sm text-gray-600">Difficulty</div>
-                        <div className="text-lg font-semibold text-gray-900">
-                          {course.difficulty}
-                        </div>
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                        <div className="text-sm text-white/60">Difficulty</div>
+                        <div className="text-lg font-semibold text-white">{course.difficulty}</div>
                       </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="text-sm text-gray-600">Lessons</div>
-                        <div className="text-lg font-semibold text-gray-900">
+                      <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                        <div className="text-sm text-white/60">Lessons</div>
+                        <div className="text-lg font-semibold text-white">
                           {course.modules.flatMap((m) => m.lessons).length}
                         </div>
                       </div>
@@ -381,12 +364,8 @@ const CourseLearning = () => {
                   <div className="space-y-4">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h2 className="text-xl font-bold text-gray-900">
-                          {currentLesson.title}
-                        </h2>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {currentLesson.duration}
-                        </p>
+                        <h2 className="text-xl font-bold text-gray-900">{currentLesson.title}</h2>
+                        <p className="text-sm text-gray-600 mt-1">{currentLesson.duration}</p>
                       </div>
                       <button
                         onClick={() => handleLessonComplete(currentLesson.id)}
@@ -419,42 +398,33 @@ const CourseLearning = () => {
                     <p className="text-gray-700">{currentLesson.description}</p>
 
                     {/* Lesson Resources */}
-                    {currentLesson.resources &&
-                      currentLesson.resources.length > 0 && (
-                        <div className="mt-6">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                            Lesson Resources
-                          </h3>
-                          <div className="space-y-2">
-                            {currentLesson.resources.map((resource, idx) => (
-                              <a
-                                key={idx}
-                                href={resource.url}
-                                className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <div className="flex items-center space-x-3">
-                                  <span className="text-2xl">
-                                    {getResourceIcon(resource.type)}
-                                  </span>
-                                  <span className="font-medium text-gray-900">
-                                    {resource.name}
-                                  </span>
-                                </div>
-                                <span className="text-primary text-sm">
-                                  Download →
-                                </span>
-                              </a>
-                            ))}
-                          </div>
+                    {currentLesson.resources && currentLesson.resources.length > 0 && (
+                      <div className="mt-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                          Lesson Resources
+                        </h3>
+                        <div className="space-y-2">
+                          {currentLesson.resources.map((resource, idx) => (
+                            <a
+                              key={idx}
+                              href={resource.url}
+                              className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <span className="text-2xl">{getResourceIcon(resource.type)}</span>
+                                <span className="font-medium text-gray-900">{resource.name}</span>
+                              </div>
+                              <span className="text-primary text-sm">Download →</span>
+                            </a>
+                          ))}
                         </div>
-                      )}
+                      </div>
+                    )}
 
                     {/* Notes Section */}
                     <div className="mt-6 border-t border-gray-200 pt-6">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          My Notes
-                        </h3>
+                        <h3 className="text-lg font-semibold text-gray-900">My Notes</h3>
                         <button
                           onClick={() => setShowNotes(!showNotes)}
                           className="text-primary hover:text-primary-700 text-sm font-medium"
@@ -470,10 +440,7 @@ const CourseLearning = () => {
                             placeholder="Write your notes here..."
                             className="input-field h-32 resize-none"
                           />
-                          <button
-                            onClick={saveNotes}
-                            className="btn-primary mt-2"
-                          >
+                          <button onClick={saveNotes} className="btn-primary mt-2">
                             Save Notes
                           </button>
                         </div>
@@ -485,9 +452,7 @@ const CourseLearning = () => {
                 {/* Resources Tab */}
                 {activeTab === "resources" && (
                   <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-900">
-                      Course Resources
-                    </h2>
+                    <h2 className="text-xl font-bold text-gray-900">Course Resources</h2>
                     <div className="space-y-2">
                       {course.resources.map((resource) => (
                         <a
@@ -496,21 +461,13 @@ const CourseLearning = () => {
                           className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
                         >
                           <div className="flex items-center space-x-4">
-                            <span className="text-3xl">
-                              {getResourceIcon(resource.type)}
-                            </span>
+                            <span className="text-3xl">{getResourceIcon(resource.type)}</span>
                             <div>
-                              <div className="font-medium text-gray-900">
-                                {resource.name}
-                              </div>
-                              <div className="text-sm text-gray-600">
-                                {resource.size}
-                              </div>
+                              <div className="font-medium text-gray-900">{resource.name}</div>
+                              <div className="text-sm text-gray-600">{resource.size}</div>
                             </div>
                           </div>
-                          <span className="text-primary text-sm font-medium">
-                            Download →
-                          </span>
+                          <span className="text-primary text-sm font-medium">Download →</span>
                         </a>
                       ))}
                     </div>
@@ -520,25 +477,19 @@ const CourseLearning = () => {
                 {/* Projects Tab */}
                 {activeTab === "projects" && (
                   <div className="space-y-4">
-                    <h2 className="text-xl font-bold text-gray-900">
-                      Practice Projects
-                    </h2>
+                    <h2 className="text-xl font-bold text-gray-900">Practice Projects</h2>
                     {course.projects.map((project) => (
-                      <div
-                        key={project.id}
-                        className="border border-gray-200 rounded-lg p-6"
-                      >
+                      <div key={project.id} className="border border-gray-200 rounded-lg p-6">
                         <div className="flex items-start justify-between">
                           <div>
                             <h3 className="text-lg font-semibold text-gray-900 mb-2">
                               {project.title}
                             </h3>
-                            <p className="text-gray-700 mb-4">
-                              {project.description}
-                            </p>
+                            <p className="text-gray-700 mb-4">{project.description}</p>
                             <div className="flex items-center space-x-4 text-sm">
                               <span className="text-gray-600">
-                                ⏱️ {project.estimatedTime}
+                                <FontAwesomeIcon icon={faClock} className="mr-1" />{" "}
+                                {project.estimatedTime}
                               </span>
                               <span
                                 className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -552,14 +503,10 @@ const CourseLearning = () => {
                             </div>
                           </div>
                           <button
-                            className={`btn-primary ${
-                              project.completed ? "opacity-50" : ""
-                            }`}
+                            className={`btn-primary ${project.completed ? "opacity-50" : ""}`}
                             disabled={project.completed}
                           >
-                            {project.completed
-                              ? "✓ Completed"
-                              : "Start Project"}
+                            {project.completed ? "✓ Completed" : "Start Project"}
                           </button>
                         </div>
                       </div>
@@ -573,9 +520,7 @@ const CourseLearning = () => {
           {/* Sidebar - Course Curriculum */}
           <div className="lg:col-span-1">
             <div className="card p-6 sticky top-4">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
-                Course Curriculum
-              </h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Course Curriculum</h3>
               <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
                 {course.modules.map((module) => (
                   <div
@@ -583,9 +528,7 @@ const CourseLearning = () => {
                     className="border border-gray-200 rounded-lg overflow-hidden"
                   >
                     <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                      <h4 className="font-semibold text-gray-900">
-                        {module.title}
-                      </h4>
+                      <h4 className="font-semibold text-gray-900">{module.title}</h4>
                       <p className="text-sm text-gray-600">{module.duration}</p>
                     </div>
                     <div className="divide-y divide-gray-200">
@@ -594,9 +537,7 @@ const CourseLearning = () => {
                           key={lesson.id}
                           onClick={() => handleLessonSelect(lesson)}
                           className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
-                            currentLesson?.id === lesson.id
-                              ? "bg-primary-50"
-                              : ""
+                            currentLesson?.id === lesson.id ? "bg-primary-50" : ""
                           }`}
                         >
                           <div className="flex items-start justify-between">
@@ -615,12 +556,10 @@ const CourseLearning = () => {
                                   {lesson.title}
                                 </span>
                               </div>
-                              <p className="text-xs text-gray-500 mt-1">
-                                {lesson.duration}
-                              </p>
+                              <p className="text-xs text-gray-500 mt-1">{lesson.duration}</p>
                             </div>
                             {currentLesson?.id === lesson.id && (
-                              <span className="text-primary">▶</span>
+                              <FontAwesomeIcon icon={faPlay} className="text-primary" />
                             )}
                           </div>
                         </button>
@@ -633,7 +572,7 @@ const CourseLearning = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageSurface>
   );
 };
 

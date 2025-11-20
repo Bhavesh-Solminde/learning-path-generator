@@ -1,71 +1,48 @@
-import { createContext, useState, useContext } from 'react';
-import { toast } from 'react-toastify';
+import { createContext, useContext, useEffect } from "react";
+import useAuthManager from "../features/auth/useAuth";
+import { AUTH_TOKEN_KEY, LEGACY_AUTH_TOKEN_KEYS } from "../constants/storageKeys";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof localStorage === "undefined") {
+      return;
+    }
 
-  const login = async (email, password) => {
-    // Simple login - just set user and navigate
-    const userData = {
-      email: email,
-      name: email.split('@')[0], // Use email prefix as name
-      id: Date.now(), // Simple ID generation
-    };
-    
-    setUser(userData);
-    toast.success('Login successful!');
-    return { success: true };
-  };
+    try {
+      const hasModernToken = localStorage.getItem(AUTH_TOKEN_KEY);
 
-  const register = async (userData) => {
-    // Simple registration - just set user and navigate
-    const newUser = {
-      email: userData.email,
-      name: userData.name,
-      interests: userData.interests,
-      id: Date.now(),
-      needsOnboarding: true, // Flag to show onboarding page
-    };
-    
-    setUser(newUser);
-    toast.success('Registration successful!');
-    return { success: true };
-  };
+      if (!hasModernToken) {
+        for (const legacyKey of LEGACY_AUTH_TOKEN_KEYS) {
+          const legacyValue = localStorage.getItem(legacyKey);
+          if (legacyValue) {
+            localStorage.setItem(AUTH_TOKEN_KEY, legacyValue);
+            break;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Failed to migrate auth token", error);
+    } finally {
+      LEGACY_AUTH_TOKEN_KEYS.forEach((legacyKey) => {
+        try {
+          localStorage.removeItem(legacyKey);
+        } catch (cleanupError) {
+          console.warn(`Unable to remove legacy auth token key: ${legacyKey}`, cleanupError);
+        }
+      });
+    }
+  }, []);
 
-  const updateUserPreferences = (preferences) => {
-    // Update user with preferences from onboarding
-    setUser({
-      ...user,
-      preferences,
-      needsOnboarding: false,
-    });
-  };
-
-  const logout = () => {
-    setUser(null);
-    toast.info('Logged out successfully');
-  };
-
-  const value = {
-    user,
-    login,
-    register,
-    logout,
-    updateUserPreferences,
-    isAuthenticated: !!user,
-    loading,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  const auth = useAuthManager();
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 };
 
-export const useAuth = () => {
+export const useAuthContext = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuthContext must be used within an AuthProvider");
   }
   return context;
 };

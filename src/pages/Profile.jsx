@@ -1,10 +1,27 @@
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { useAuthContext } from "../context/AuthContext";
+import { useLayout } from "../context/LayoutContext";
+import { notifySuccess } from "../utils/notify";
 import PageHeader from "../components/PageHeader";
+import PageSurface from "../components/PageSurface";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faUser,
+  faRocket,
+  faCalendar,
+  faPuzzlePiece,
+  faHandshake,
+  faTrophy,
+  faChalkboardTeacher,
+  faLock,
+  faTrash,
+  faBell,
+  faGlobe,
+} from "../icons";
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { currentUser: user } = useAuthContext();
+  const { setHeaderActions, resetHeaderActions } = useLayout();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
@@ -14,18 +31,22 @@ const Profile = () => {
     learningGoal: user?.learningGoal || "Become a Full Stack Developer",
   });
 
+  useEffect(() => {
+    setHeaderActions({ showProfileButton: false });
+    return () => resetHeaderActions();
+  }, [resetHeaderActions, setHeaderActions]);
+
   const badges = [
-    { id: 1, name: "Fast Learner", icon: "🚀", earned: true },
-    { id: 2, name: "Consistent", icon: "📅", earned: true },
-    { id: 3, name: "Problem Solver", icon: "🧩", earned: true },
-    { id: 4, name: "Team Player", icon: "🤝", earned: false },
-    { id: 5, name: "Expert", icon: "🏆", earned: false },
-    { id: 6, name: "Mentor", icon: "👨‍🏫", earned: false },
+    { id: 1, name: "Fast Learner", icon: faRocket, earned: true },
+    { id: 2, name: "Consistent", icon: faCalendar, earned: true },
+    { id: 3, name: "Problem Solver", icon: faPuzzlePiece, earned: true },
+    { id: 4, name: "Team Player", icon: faHandshake, earned: false },
+    { id: 5, name: "Expert", icon: faTrophy, earned: false },
+    { id: 6, name: "Mentor", icon: faChalkboardTeacher, earned: false },
   ];
 
   const learningPreferences = {
-    preferredDifficulty:
-      user?.preferences?.preferredDifficulty || "Intermediate",
+    preferredDifficulty: user?.preferences?.preferredDifficulty || "Intermediate",
     learningStyle: user?.preferences?.learningStyle || "Visual & Practical",
     dailyGoal: user?.preferences?.dailyTimeCommitment || "2 hours",
     preferredCategories: user?.preferences?.selectedCategories || [
@@ -44,7 +65,7 @@ const Profile = () => {
 
   const handleSave = () => {
     // Here you would typically make an API call to update the profile
-    toast.success("Profile updated successfully!");
+    notifySuccess("Profile updated successfully!");
     setIsEditing(false);
   };
 
@@ -60,14 +81,18 @@ const Profile = () => {
   };
 
   return (
-    <div className="fade-in">
-      <PageHeader title="My Profile 👤" showProfileButton={false} />
+    <PageSurface className="fade-in">
+      <div className="px-4 py-6 md:px-8 lg:px-12 space-y-8">
+        <PageHeader
+          title={
+            <span>
+              My Profile <FontAwesomeIcon icon={faUser} />
+            </span>
+          }
+        />
 
-      <div className="p-8">
-        <div className="mb-8">
-          <p className="text-text-secondary">
-            Manage your account and learning preferences.
-          </p>
+        <div>
+          <p className="text-text-secondary">Manage your account and learning preferences.</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -76,14 +101,9 @@ const Profile = () => {
             {/* Basic Info Card */}
             <div className="card p-6 card-hover-glow">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-text-primary">
-                  Personal Information
-                </h2>
+                <h2 className="text-2xl font-bold text-text-primary">Personal Information</h2>
                 {!isEditing ? (
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="btn-primary"
-                  >
+                  <button onClick={() => setIsEditing(true)} className="btn-primary">
                     Edit Profile
                   </button>
                 ) : (
@@ -128,9 +148,7 @@ const Profile = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-text-primary mb-2">
-                    Bio
-                  </label>
+                  <label className="block text-sm font-medium text-text-primary mb-2">Bio</label>
                   <textarea
                     name="bio"
                     value={formData.bio}
@@ -173,37 +191,31 @@ const Profile = () => {
 
             {/* Learning Preferences Card */}
             <div className="card p-6 card-hover-glow">
-              <h2 className="text-2xl font-bold text-text-primary mb-6">
-                Learning Preferences
-              </h2>
+              <h2 className="text-2xl font-bold text-text-primary mb-6">Learning Preferences</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-muted/10 rounded-lg">
-                  <p className="text-sm text-text-secondary mb-1">
-                    Preferred Difficulty
-                  </p>
+                <div className="p-4 bg-muted/10 rounded-xl">
+                  <p className="text-sm text-text-secondary mb-1">Preferred Difficulty</p>
                   <p className="text-lg font-semibold text-text-primary">
                     {learningPreferences.preferredDifficulty}
                   </p>
                 </div>
 
-                <div className="p-4 bg-muted/10 rounded-lg">
-                  <p className="text-sm text-text-secondary mb-1">
-                    Learning Style
-                  </p>
+                <div className="p-4 bg-muted/10 rounded-xl">
+                  <p className="text-sm text-text-secondary mb-1">Learning Style</p>
                   <p className="text-lg font-semibold text-text-primary">
                     {learningPreferences.learningStyle}
                   </p>
                 </div>
 
-                <div className="p-4 bg-muted/10 rounded-lg">
+                <div className="p-4 bg-muted/10 rounded-xl">
                   <p className="text-sm text-text-secondary mb-1">Daily Goal</p>
                   <p className="text-lg font-semibold text-text-primary">
                     {learningPreferences.dailyGoal}
                   </p>
                 </div>
 
-                <div className="p-4 bg-muted/10 rounded-lg">
+                <div className="p-4 bg-muted/10 rounded-xl">
                   <p className="text-sm text-text-secondary mb-1">Categories</p>
                   <p className="text-sm font-semibold text-text-primary">
                     {learningPreferences.preferredCategories.join(", ")}
@@ -220,9 +232,7 @@ const Profile = () => {
               <div className="w-24 h-24 bg-primary rounded-full flex items-center justify-center text-4xl text-white mx-auto mb-4 ring-4 ring-gold">
                 {user?.name?.charAt(0)?.toUpperCase() || "U"}
               </div>
-              <h3 className="text-xl font-bold text-profile-name mb-1">
-                {user?.name || "User"}
-              </h3>
+              <h3 className="text-xl font-bold text-profile-name mb-1">{user?.name || "User"}</h3>
               <p className="text-profile-subtitle text-sm mb-4">
                 {user?.email || "user@example.com"}
               </p>
@@ -242,19 +252,22 @@ const Profile = () => {
             {/* Badges Card */}
             <div className="card p-6 card-hover-glow">
               <h2 className="text-xl font-bold text-text-primary mb-4">
-                Achievements 🏆
+                Achievements <FontAwesomeIcon icon={faTrophy} className="text-gold" />
               </h2>
               <div className="grid grid-cols-3 gap-4">
                 {badges.map((badge) => (
                   <div
                     key={badge.id}
-                    className={`flex flex-col items-center p-3 rounded-lg transition-all ${
+                    className={`flex flex-col items-center p-3 rounded-xl transition-all ${
                       badge.earned
                         ? "bg-primary-100 border-2 border-primary"
                         : "bg-muted/20 opacity-50"
                     }`}
                   >
-                    <span className="text-3xl mb-2">{badge.icon}</span>
+                    <FontAwesomeIcon
+                      icon={badge.icon}
+                      className={`text-3xl mb-2 ${badge.earned ? "text-primary" : "text-gray-400"}`}
+                    />
                     <p
                       className={`text-xs text-center font-medium ${
                         badge.earned ? "text-primary-700" : "text-muted"
@@ -269,28 +282,26 @@ const Profile = () => {
 
             {/* Account Actions */}
             <div className="card p-6 card-hover-glow">
-              <h2 className="text-xl font-bold text-text-primary mb-4">
-                Account Settings
-              </h2>
+              <h2 className="text-xl font-bold text-text-primary mb-4">Account Settings</h2>
               <div className="space-y-3">
-                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-lg transition-all">
-                  🔔 Notification Settings
+                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-xl transition-all flex items-center">
+                  <FontAwesomeIcon icon={faBell} className="mr-2" /> Notification Settings
                 </button>
-                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-lg transition-all">
-                  🔐 Change Password
+                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-xl transition-all flex items-center">
+                  <FontAwesomeIcon icon={faLock} className="mr-2" /> Change Password
                 </button>
-                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-lg transition-all">
-                  🌐 Language & Region
+                <button className="w-full py-2 px-4 text-left text-text-primary hover:bg-muted/20 rounded-xl transition-all flex items-center">
+                  <FontAwesomeIcon icon={faGlobe} className="mr-2" /> Language & Region
                 </button>
-                <button className="w-full py-2 px-4 text-left text-error hover:bg-error/10 rounded-lg transition-all">
-                  🗑️ Delete Account
+                <button className="w-full py-2 px-4 text-left text-error hover:bg-error/10 rounded-xl transition-all flex items-center">
+                  <FontAwesomeIcon icon={faTrash} className="mr-2" /> Delete Account
                 </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </PageSurface>
   );
 };
 

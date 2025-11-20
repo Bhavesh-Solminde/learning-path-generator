@@ -1,10 +1,15 @@
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { useAuthContext } from "../context/AuthContext";
+import { useLayout } from "../context/LayoutContext";
+import { notifyError, notifyInfo, notifySuccess } from "../utils/notify";
 import PageHeader from "../components/PageHeader";
+import PageSurface from "../components/PageSurface";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faCog, faLock, faFileAlt, faMobileAlt, faBell } from "../icons";
 
 const Settings = () => {
-  const { user, logout } = useAuth();
+  const { currentUser: user, logout } = useAuthContext();
+  const { setHeaderActions, resetHeaderActions } = useLayout();
   const [activeTab, setActiveTab] = useState("account");
 
   const [accountSettings, setAccountSettings] = useState({
@@ -51,59 +56,60 @@ const Settings = () => {
     });
   };
 
+  useEffect(() => {
+    setHeaderActions({ showProfileButton: false });
+    return () => resetHeaderActions();
+  }, [resetHeaderActions, setHeaderActions]);
+
   const handleSaveAccount = () => {
     // Validate passwords if changing
     if (accountSettings.newPassword) {
       if (accountSettings.newPassword !== accountSettings.confirmPassword) {
-        toast.error("Passwords do not match");
+        notifyError("Passwords do not match");
         return;
       }
       if (accountSettings.newPassword.length < 6) {
-        toast.error("Password must be at least 6 characters");
+        notifyError("Password must be at least 6 characters");
         return;
       }
     }
 
     // Save account settings
-    toast.success("Account settings saved successfully!");
+    notifySuccess("Account settings saved successfully!");
   };
 
   const handleSaveNotifications = () => {
-    toast.success("Notification preferences saved!");
+    notifySuccess("Notification preferences saved!");
   };
 
   const handleSavePreferences = () => {
-    toast.success("Preferences saved!");
+    notifySuccess("Preferences saved!");
   };
 
   const handleDeleteAccount = () => {
     if (
-      window.confirm(
-        "Are you sure you want to delete your account? This action cannot be undone."
-      )
+      window.confirm("Are you sure you want to delete your account? This action cannot be undone.")
     ) {
       logout();
-      toast.info("Account deleted");
+      notifyInfo("Account deleted");
     }
   };
 
   const tabs = [
-    { id: "account", label: "Account", icon: "👤" },
-    { id: "notifications", label: "Notifications", icon: "🔔" },
-    { id: "preferences", label: "Preferences", icon: "⚙️" },
-    { id: "security", label: "Security", icon: "🔐" },
+    { id: "account", label: "Account", icon: faUser },
+    { id: "notifications", label: "Notifications", icon: faBell },
+    { id: "preferences", label: "Preferences", icon: faCog },
+    { id: "security", label: "Security", icon: faLock },
   ];
 
   return (
-    <div className="fade-in">
-      <PageHeader title="Settings" showProfileButton={false} />
+    <PageSurface className="fade-in">
+      <div className="px-4 py-6 md:px-8 lg:px-12 space-y-8">
+        <PageHeader title="Settings" />
 
-      <div className="p-8">
         {/* Header */}
-        <div className="mb-8">
-          <p className="text-text-secondary">
-            Manage your account settings and preferences
-          </p>
+        <div>
+          <p className="text-text-secondary">Manage your account settings and preferences</p>
         </div>
 
         {/* Tabs */}
@@ -118,7 +124,7 @@ const Settings = () => {
                   : "border-transparent text-text-secondary hover:text-text-primary"
               }`}
             >
-              <span className="mr-2">{tab.icon}</span>
+              <FontAwesomeIcon icon={tab.icon} className="mr-2" />
               {tab.label}
             </button>
           ))}
@@ -130,9 +136,7 @@ const Settings = () => {
           {activeTab === "account" && (
             <div className="space-y-6">
               <div className="card p-6">
-                <h2 className="text-xl font-bold text-text-primary mb-6">
-                  Account Information
-                </h2>
+                <h2 className="text-xl font-bold text-text-primary mb-6">Account Information</h2>
 
                 <div className="space-y-4">
                   <div>
@@ -246,31 +250,22 @@ const Settings = () => {
                       <div>
                         <p className="font-medium text-text-primary">{label}</p>
                         <p className="text-sm text-text-secondary">
-                          {key === "emailNotifications" &&
-                            "Receive all email notifications"}
-                          {key === "courseUpdates" &&
-                            "Get notified about new course content"}
-                          {key === "progressReports" &&
-                            "Receive weekly progress reports"}
-                          {key === "weeklyDigest" &&
-                            "Get a weekly summary of your activity"}
-                          {key === "marketingEmails" &&
-                            "Receive promotional emails and offers"}
+                          {key === "emailNotifications" && "Receive all email notifications"}
+                          {key === "courseUpdates" && "Get notified about new course content"}
+                          {key === "progressReports" && "Receive weekly progress reports"}
+                          {key === "weeklyDigest" && "Get a weekly summary of your activity"}
+                          {key === "marketingEmails" && "Receive promotional emails and offers"}
                         </p>
                       </div>
                       <button
                         onClick={() => handleNotificationToggle(key)}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          notificationSettings[key]
-                            ? "bg-primary"
-                            : "bg-gray-300"
+                          notificationSettings[key] ? "bg-primary" : "bg-gray-300"
                         }`}
                       >
                         <span
                           className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                            notificationSettings[key]
-                              ? "translate-x-6"
-                              : "translate-x-1"
+                            notificationSettings[key] ? "translate-x-6" : "translate-x-1"
                           }`}
                         />
                       </button>
@@ -278,10 +273,7 @@ const Settings = () => {
                   ))}
 
                   <div className="flex justify-end pt-4">
-                    <button
-                      onClick={handleSaveNotifications}
-                      className="btn-primary"
-                    >
+                    <button onClick={handleSaveNotifications} className="btn-primary">
                       Save Preferences
                     </button>
                   </div>
@@ -294,9 +286,7 @@ const Settings = () => {
           {activeTab === "preferences" && (
             <div className="space-y-6">
               <div className="card p-6">
-                <h2 className="text-xl font-bold text-text-primary mb-6">
-                  General Preferences
-                </h2>
+                <h2 className="text-xl font-bold text-text-primary mb-6">General Preferences</h2>
 
                 <div className="space-y-4">
                   <div>
@@ -353,9 +343,7 @@ const Settings = () => {
 
                   <div className="flex items-center justify-between py-3 border-t border-gray-200">
                     <div>
-                      <p className="font-medium text-text-primary">
-                        Auto-play Videos
-                      </p>
+                      <p className="font-medium text-text-primary">Auto-play Videos</p>
                       <p className="text-sm text-text-secondary">
                         Automatically play next lesson video
                       </p>
@@ -373,19 +361,14 @@ const Settings = () => {
                     >
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                          preferences.autoPlay
-                            ? "translate-x-6"
-                            : "translate-x-1"
+                          preferences.autoPlay ? "translate-x-6" : "translate-x-1"
                         }`}
                       />
                     </button>
                   </div>
 
                   <div className="flex justify-end pt-4">
-                    <button
-                      onClick={handleSavePreferences}
-                      className="btn-primary"
-                    >
+                    <button onClick={handleSavePreferences} className="btn-primary">
                       Save Preferences
                     </button>
                   </div>
@@ -398,14 +381,12 @@ const Settings = () => {
           {activeTab === "security" && (
             <div className="space-y-6">
               <div className="card p-6">
-                <h2 className="text-xl font-bold text-text-primary mb-6">
-                  Security Settings
-                </h2>
+                <h2 className="text-xl font-bold text-text-primary mb-6">Security Settings</h2>
 
                 <div className="space-y-4">
-                  <div className="p-4 bg-accent/10 border border-accent/30 rounded-lg">
+                  <div className="p-4 bg-accent/10 border border-accent/30 rounded-xl">
                     <div className="flex items-start">
-                      <span className="text-2xl mr-3">🔐</span>
+                      <FontAwesomeIcon icon={faLock} className="text-2xl mr-3 text-accent" />
                       <div>
                         <h3 className="font-semibold text-text-primary mb-1">
                           Two-Factor Authentication
@@ -413,62 +394,47 @@ const Settings = () => {
                         <p className="text-sm text-text-secondary mb-3">
                           Add an extra layer of security to your account
                         </p>
-                        <button className="btn-secondary text-sm">
-                          Enable 2FA
-                        </button>
+                        <button className="btn-secondary text-sm">Enable 2FA</button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-4 bg-muted/10 border border-card-border/20 rounded-lg">
+                  <div className="p-4 bg-muted/10 border border-card-border/20 rounded-xl">
                     <div className="flex items-start">
-                      <span className="text-2xl mr-3">📱</span>
+                      <FontAwesomeIcon icon={faMobileAlt} className="text-2xl mr-3 text-primary" />
                       <div>
-                        <h3 className="font-semibold text-text-primary mb-1">
-                          Active Sessions
-                        </h3>
+                        <h3 className="font-semibold text-text-primary mb-1">Active Sessions</h3>
                         <p className="text-sm text-text-secondary mb-3">
                           Manage devices where you're currently logged in
                         </p>
-                        <button className="btn-secondary text-sm">
-                          View Sessions
-                        </button>
+                        <button className="btn-secondary text-sm">View Sessions</button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-4 bg-muted/10 border border-card-border/20 rounded-lg">
+                  <div className="p-4 bg-muted/10 border border-card-border/20 rounded-xl">
                     <div className="flex items-start">
-                      <span className="text-2xl mr-3">📜</span>
+                      <FontAwesomeIcon icon={faFileAlt} className="text-2xl mr-3 text-primary" />
                       <div>
-                        <h3 className="font-semibold text-text-primary mb-1">
-                          Activity Log
-                        </h3>
+                        <h3 className="font-semibold text-text-primary mb-1">Activity Log</h3>
                         <p className="text-sm text-text-secondary mb-3">
                           Review your recent account activity
                         </p>
-                        <button className="btn-secondary text-sm">
-                          View Activity
-                        </button>
+                        <button className="btn-secondary text-sm">View Activity</button>
                       </div>
                     </div>
                   </div>
 
                   <div className="pt-6 border-t border-card-border/30">
-                    <h3 className="text-lg font-semibold text-red-600 mb-3">
-                      Danger Zone
-                    </h3>
-                    <div className="p-4 bg-error/10 border border-error/30 rounded-lg">
-                      <h4 className="font-semibold text-text-primary mb-2">
-                        Delete Account
-                      </h4>
+                    <h3 className="text-lg font-semibold text-red-600 mb-3">Danger Zone</h3>
+                    <div className="p-4 bg-error/10 border border-error/30 rounded-xl">
+                      <h4 className="font-semibold text-text-primary mb-2">Delete Account</h4>
                       <p className="text-sm text-text-secondary mb-4">
-                        Once you delete your account, there is no going back.
-                        Please be certain.
+                        Once you delete your account, there is no going back. Please be certain.
                       </p>
                       <button
                         onClick={handleDeleteAccount}
-                        className="bg-error text-white px-4 py-2 rounded-lg hover:bg-error/80 transition-colors"
+                        className="bg-error text-white px-4 py-2 rounded-xl hover:bg-error/80 transition-colors"
                       >
                         Delete My Account
                       </button>
@@ -480,7 +446,7 @@ const Settings = () => {
           )}
         </div>
       </div>
-    </div>
+    </PageSurface>
   );
 };
 

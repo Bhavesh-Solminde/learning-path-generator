@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { notifyError } from "../utils/notify";
+import { useAuthContext } from "../context/AuthContext";
+import RegisterForm from "../features/auth/RegisterForm";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -11,164 +12,60 @@ const Register = () => {
     confirmPassword: "",
     interests: "",
   });
-  const [loading, setLoading] = useState(false);
-  const { register } = useAuth();
+  const { register, loading } = useAuthContext();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     if (!formData.name || !formData.email || !formData.password) {
-      toast.error("Please fill in all required fields");
+      notifyError("Please fill in all required fields");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match!");
+      notifyError("Passwords do not match!");
       return;
     }
 
-    setLoading(true);
-
     const { confirmPassword, ...userData } = formData;
-    const result = await register(userData);
-
-    if (result.success) {
+    try {
+      await register(userData);
       navigate("/onboarding");
+    } catch (error) {
+      notifyError(error.message ?? "Unable to create your account.");
     }
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-500 to-secondary-900 px-4 py-12">
-      <div className="card max-w-md w-full p-8 fade-in">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Create Account
-          </h1>
-          <p className="text-gray-600">
-            Start your personalized learning journey
-          </p>
+    <div className="min-h-screen bg-night-soft text-white flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute w-[400px] h-[400px] bg-glow-blue blur-[140px] left-1/3 top-10"></div>
+        <div className="absolute w-[500px] h-[500px] bg-glow-violet blur-[160px] right-1/4 bottom-0"></div>
+      </div>
+      <div className="relative card max-w-2xl w-full p-10 fade-in">
+        <div className="text-center mb-8 space-y-3">
+          <p className="text-xs uppercase tracking-[0.4em] text-white/60">PathForge Access</p>
+          <h1 className="text-3xl font-semibold tracking-tight">Create Account</h1>
+          <p className="text-sm text-white/60">Start your personalized learning journey</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Full Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              required
-              value={formData.name}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="John Doe"
-            />
-          </div>
+        <RegisterForm
+          values={formData}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          loading={loading}
+        />
 
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Email Address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Confirm Password
-            </label>
-            <input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              required
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="interests"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Interests (Optional)
-            </label>
-            <input
-              id="interests"
-              name="interests"
-              type="text"
-              value={formData.interests}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="e.g., Web Development, AI, Data Science"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary w-full"
-          >
-            {loading ? "Creating Account..." : "Sign Up"}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="font-medium text-primary hover:text-primary-700"
-            >
-              Sign in
-            </Link>
-          </p>
+        <div className="mt-8 text-center text-sm text-white/70">
+          Already have an account?{" "}
+          <Link to="/login" className="text-white font-semibold hover:text-accent-blue">
+            Sign in
+          </Link>
         </div>
       </div>
     </div>

@@ -1,134 +1,60 @@
 import { useState } from "react";
-
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { notifyError } from "../utils/notify";
+import { useAuthContext } from "../context/AuthContext";
+import LoginForm from "../features/auth/LoginForm";
 import "./Login.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, loading } = useAuthContext();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (name, value) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     if (!formData.email || !formData.password) {
-      toast.error("Please fill in all fields");
+      notifyError("Please fill in all fields");
       return;
     }
 
-    setLoading(true);
-
-    const result = await login(formData.email, formData.password);
-
-    if (result.success) {
+    try {
+      await login(formData.email, formData.password);
       navigate("/dashboard");
+    } catch (error) {
+      notifyError(error.message ?? "Unable to sign in. Please try again.");
     }
-    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-500 to-secondary-900 px-4">
-      <div className="card max-w-md w-full p-8 fade-in login-card">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome Back
-          </h1>
-          <p className="text-gray-600">
-            Sign in to continue your learning journey
-          </p>
+    <div className="min-h-screen bg-night-soft text-white flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute w-[500px] h-[500px] bg-ash-soft/20 blur-[120px] left-1/4 -top-20"></div>
+        <div className="absolute w-[600px] h-[600px] bg-glow-violet/40 blur-[160px] right-1/3 bottom-0"></div>
+      </div>
+      <div className="relative card max-w-lg w-full p-10 fade-in login-card">
+        <div className="text-center mb-8 space-y-2">
+          <p className="text-xs uppercase tracking-[0.3em] text-white/60">PathForge Premium</p>
+          <h1 className="text-3xl font-semibold tracking-tight">Welcome Back</h1>
+          <p className="text-sm text-white/60">Continue mastering your learning path</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Email Address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="you@example.com"
-            />
-          </div>
+        <LoginForm
+          values={formData}
+          onChange={handleChange}
+          onSubmit={handleSubmit}
+          loading={loading}
+        />
 
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="input-field"
-              placeholder="••••••••"
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-              />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-700"
-              >
-                Remember me
-              </label>
-            </div>
-
-            <div className="text-sm">
-              <a
-                href="#"
-                className="font-medium text-primary hover:text-primary-700"
-              >
-                Forgot password?
-              </a>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary w-full"
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="font-medium text-primary hover:text-primary-700"
-            >
-              Sign up
-            </Link>
-          </p>
+        <div className="mt-8 text-center text-sm text-white/70">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-white font-semibold hover:text-accent-blue">
+            Sign up
+          </Link>
         </div>
       </div>
     </div>
